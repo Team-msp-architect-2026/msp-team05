@@ -1,8 +1,12 @@
 .gradle/
 build/
-*.class
-*.jar
 !gradle/wrapper/gradle-wrapper.jar
+*.class
+*.log
+out/
 .idea/
 *.iml
+*.iws
+*.ipr
 HELP.md
+.DS_Store
