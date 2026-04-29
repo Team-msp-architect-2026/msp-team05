@@ -11,28 +11,58 @@ interface Seat {
   row: string;
   number: string;
   status: string;
+  zone: string;
 }
 
-interface Zone {
-  zoneId: string;
-  zoneName: string;
-  price: number;
-  seats: Seat[];
-}
+const ZONES = [
+  { id: 'zone1', name: '1루 지정석', color: '#3B82F6', price: 15000 },
+  { id: 'zone2', name: '3루 지정석', color: '#8B5CF6', price: 15000 },
+  { id: 'zone3', name: '외야 응원석', color: '#EF4444', price: 10000 },
+  { id: 'zone4', name: '내야 지정석', color: '#10B981', price: 20000 },
+];
+
+// 더미 좌석 데이터 생성
+const generateSeats = (): Seat[] => {
+  const seats: Seat[] = [];
+  const zones = [
+    { id: 'zone1', rows: ['A', 'B', 'C', 'D'], cols: 10 },
+    { id: 'zone2', rows: ['A', 'B', 'C', 'D'], cols: 10 },
+    { id: 'zone3', rows: ['A', 'B', 'C'], cols: 15 },
+    { id: 'zone4', rows: ['A', 'B', 'C', 'D', 'E'], cols: 8 },
+  ];
+
+  zones.forEach(zone => {
+    zone.rows.forEach(row => {
+      for (let i = 1; i <= zone.cols; i++) {
+        seats.push({
+          seatId: `${zone.id}-${row}-${i}`,
+          row,
+          number: String(i),
+          status: Math.random() > 0.3 ? 'AVAILABLE' : Math.random() > 0.5 ? 'RESERVED' : 'LOCKED',
+          zone: zone.id,
+        });
+      }
+    });
+  });
+
+  return seats;
+};
 
 export default function SeatSelectPage() {
   const { gameId } = useParams();
   const navigate = useNavigate();
-  const [zones, setZones] = useState<Zone[]>([]);
+  const [seats, setSeats] = useState<Seat[]>([]);
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
+  const [selectedZone, setSelectedZone] = useState<string>('zone1');
   const [loading, setLoading] = useState(true);
   const stompClient = useRef<Client | null>(null);
 
   useEffect(() => {
-    api.get(`/api/games/${gameId}/seats`)
-      .then(res => setZones(res.data.data.zones))
-      .catch(err => console.error(err))
-      .finally(() => setLoading(false));
+    // 백엔드 연동 전 더미 데이터 사용
+    setTimeout(() => {
+      setSeats(generateSeats());
+      setLoading(false);
+    }, 500);
 
     // WebSocket 연결
     const client = new Client({
@@ -40,15 +70,9 @@ export default function SeatSelectPage() {
       onConnect: () => {
         client.subscribe(`/topic/seats/${gameId}`, (message) => {
           const data = JSON.parse(message.body);
-          // 실시간 좌석 상태 업데이트
-          setZones(prev => prev.map(zone => ({
-            ...zone,
-            seats: zone.seats.map(seat =>
-              seat.seatId === data.seatId
-                ? { ...seat, status: data.status }
-                : seat
-            )
-          })));
+          setSeats(prev => prev.map(seat =>
+            seat.seatId === data.seatId ? { ...seat, status: data.status } : seat
+          ));
         });
       },
     });
@@ -56,9 +80,7 @@ export default function SeatSelectPage() {
     client.activate();
     stompClient.current = client;
 
-    return () => {
-      client.deactivate();
-    };
+    return () => { client.deactivate(); };
   }, [gameId]);
 
   const toggleSeat = (seatId: string) => {
@@ -84,64 +106,149 @@ export default function SeatSelectPage() {
       });
       localStorage.setItem('lockToken', res.data.data.lockToken);
       navigate('/checkout');
-    } catch (err) {
+    } catch {
       alert('좌석 선점에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
   if (loading) return <Spinner />;
 
+  const currentZoneSeats = seats.filter(s => s.zone === selectedZone);
+  const currentZone = ZONES.find(z => z.id === selectedZone);
+  const rows = [...new Set(currentZoneSeats.map(s => s.row))];
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-xl shadow p-4 mb-6 flex justify-between items-center">
-          <p className="text-gray-600">최대 4석까지 선택 가능합니다.</p>
-          <span className="bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-full">
-            {selectedSeats.length}석 선택
-          </span>
-        </div>
 
-        <div className="bg-white rounded-xl shadow p-4 mb-4 flex gap-4 text-sm">
-          <div className="flex items-center gap-2"><div className="w-4 h-4 bg-white border border-gray-300 rounded"></div> 선택 가능</div>
-          <div className="flex items-center gap-2"><div className="w-4 h-4 bg-green-500 rounded"></div> 선택됨</div>
-          <div className="flex items-center gap-2"><div className="w-4 h-4 bg-orange-400 rounded"></div> 선점 중</div>
-          <div className="flex items-center gap-2"><div className="w-4 h-4 bg-gray-400 rounded"></div> 예매 완료</div>
-        </div>
+        {/* 야구장 시각화 */}
+        <div className="bg-white rounded-xl shadow p-6 mb-6">
+          <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">구역 선택</h2>
+          <div className="relative w-full max-w-lg mx-auto" style={{ height: '300px' }}>
+            {/* 그라운드 */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-40 h-40 bg-green-600 rounded-full flex items-center justify-center">
+                <div className="w-24 h-24 bg-yellow-600 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold text-xs text-center">홈플레이트</span>
+                </div>
+              </div>
+            </div>
 
-        {zones.map(zone => (
-          <div key={zone.zoneId} className="bg-white rounded-xl shadow p-6 mb-4">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="font-bold text-gray-800 text-lg">{zone.zoneName}</h2>
-              <span className="text-blue-600 font-bold">{zone.price.toLocaleString()}원</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {zone.seats.map(seat => (
-                <button
-                  key={seat.seatId}
-                  onClick={() => seat.status === 'AVAILABLE' && toggleSeat(seat.seatId)}
-                  className={`w-12 h-12 rounded text-xs font-medium transition ${
-                    seat.status === 'RESERVED' ? 'bg-gray-400 text-white cursor-not-allowed' :
-                    seat.status === 'LOCKED' ? 'bg-orange-400 text-white cursor-not-allowed' :
-                    selectedSeats.includes(seat.seatId) ? 'bg-green-500 text-white' :
-                    'bg-white border border-gray-300 hover:border-blue-500'
-                  }`}
-                >
-                  {seat.row}{seat.number}
-                </button>
-              ))}
-            </div>
+            {/* 1루 지정석 */}
+            <button
+              onClick={() => setSelectedZone('zone1')}
+              className={`absolute right-4 top-1/2 -translate-y-1/2 w-24 h-20 rounded-lg font-bold text-white text-xs transition ${
+                selectedZone === 'zone1' ? 'ring-4 ring-yellow-400 scale-110' : 'opacity-80 hover:opacity-100'
+              }`}
+              style={{ backgroundColor: '#3B82F6' }}
+            >
+              1루<br/>지정석<br/>15,000원
+            </button>
+
+            {/* 3루 지정석 */}
+            <button
+              onClick={() => setSelectedZone('zone2')}
+              className={`absolute left-4 top-1/2 -translate-y-1/2 w-24 h-20 rounded-lg font-bold text-white text-xs transition ${
+                selectedZone === 'zone2' ? 'ring-4 ring-yellow-400 scale-110' : 'opacity-80 hover:opacity-100'
+              }`}
+              style={{ backgroundColor: '#8B5CF6' }}
+            >
+              3루<br/>지정석<br/>15,000원
+            </button>
+
+            {/* 외야 응원석 */}
+            <button
+              onClick={() => setSelectedZone('zone3')}
+              className={`absolute top-2 left-1/2 -translate-x-1/2 w-32 h-16 rounded-lg font-bold text-white text-xs transition ${
+                selectedZone === 'zone3' ? 'ring-4 ring-yellow-400 scale-110' : 'opacity-80 hover:opacity-100'
+              }`}
+              style={{ backgroundColor: '#EF4444' }}
+            >
+              외야 응원석<br/>10,000원
+            </button>
+
+            {/* 내야 지정석 */}
+            <button
+              onClick={() => setSelectedZone('zone4')}
+              className={`absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-16 rounded-lg font-bold text-white text-xs transition ${
+                selectedZone === 'zone4' ? 'ring-4 ring-yellow-400 scale-110' : 'opacity-80 hover:opacity-100'
+              }`}
+              style={{ backgroundColor: '#10B981' }}
+            >
+              내야 지정석<br/>20,000원
+            </button>
           </div>
-        ))}
+        </div>
 
+        {/* 선택된 구역 좌석 */}
+        <div className="bg-white rounded-xl shadow p-6 mb-24">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="font-bold text-gray-800 text-lg">
+              {currentZone?.name}
+              <span className="ml-2 text-blue-600">{currentZone?.price.toLocaleString()}원</span>
+            </h2>
+            <span className="bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-full text-sm">
+              {selectedSeats.length}석 선택
+            </span>
+          </div>
+
+          {/* 좌석 범례 */}
+          <div className="flex gap-4 text-xs mb-4">
+            <div className="flex items-center gap-1"><div className="w-3 h-3 bg-white border border-gray-300 rounded"></div> 선택 가능</div>
+            <div className="flex items-center gap-1"><div className="w-3 h-3 bg-green-500 rounded"></div> 선택됨</div>
+            <div className="flex items-center gap-1"><div className="w-3 h-3 bg-orange-400 rounded"></div> 선점 중</div>
+            <div className="flex items-center gap-1"><div className="w-3 h-3 bg-gray-400 rounded"></div> 매진</div>
+          </div>
+
+          {/* 무대/필드 방향 표시 */}
+          <div className="text-center text-xs text-gray-400 mb-4 bg-gray-100 py-1 rounded">
+            ▲ 필드 방향
+          </div>
+
+          {/* 좌석 배치 */}
+          <div className="overflow-x-auto">
+            {rows.map(row => (
+              <div key={row} className="flex items-center gap-1 mb-1">
+                <span className="text-xs text-gray-400 w-4 font-bold">{row}</span>
+                <div className="flex gap-1 flex-wrap">
+                  {currentZoneSeats
+                    .filter(s => s.row === row)
+                    .sort((a, b) => parseInt(a.number) - parseInt(b.number))
+                    .map(seat => (
+                      <button
+                        key={seat.seatId}
+                        onClick={() => seat.status === 'AVAILABLE' && toggleSeat(seat.seatId)}
+                        className={`w-8 h-8 rounded text-xs font-medium transition ${
+                          seat.status === 'RESERVED' ? 'bg-gray-400 text-white cursor-not-allowed' :
+                          seat.status === 'LOCKED' ? 'bg-orange-400 text-white cursor-not-allowed' :
+                          selectedSeats.includes(seat.seatId) ? 'bg-green-500 text-white' :
+                          'bg-white border border-gray-300 hover:border-blue-500'
+                        }`}
+                        title={`${row}열 ${seat.number}번`}
+                      >
+                        {seat.number}
+                      </button>
+                    ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 하단 선택 완료 버튼 */}
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-6xl mx-auto flex justify-between items-center">
+            <div>
+              <p className="text-sm text-gray-500">선택한 좌석</p>
+              <p className="font-bold text-blue-900">{selectedSeats.length}석 / 최대 4석</p>
+            </div>
             <button
               onClick={handleLock}
-              className="w-full bg-blue-900 text-white py-3 rounded-lg font-bold text-lg hover:bg-blue-800 transition"
+              className="bg-blue-900 text-white px-8 py-3 rounded-lg font-bold text-lg hover:bg-blue-800 transition"
             >
-              선택 완료 ({selectedSeats.length}석)
+              선택 완료
             </button>
           </div>
         </div>
