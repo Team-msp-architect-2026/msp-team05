@@ -85,7 +85,7 @@ export default function GameDetailPage() {
               </div>
               <p className="text-gray-500 text-sm mb-3">잔여 좌석: {zone.remainingSeats}석</p>
               <button
-                onClick={() => navigate(`/games/${gameId}/seats`)}
+                onClick={() => navigate(`/games/${gameId}/queue`)}
                 disabled={zone.remainingSeats === 0}
                 className={`w-full py-2 rounded-lg font-bold transition ${
                   zone.remainingSeats === 0

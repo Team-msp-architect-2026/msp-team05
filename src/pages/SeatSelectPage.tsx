@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 import api from '../api/axios';
 import Navbar from '../components/Navbar';
 import Spinner from '../components/Spinner';
@@ -24,12 +26,39 @@ export default function SeatSelectPage() {
   const [zones, setZones] = useState<Zone[]>([]);
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const stompClient = useRef<Client | null>(null);
 
   useEffect(() => {
     api.get(`/api/games/${gameId}/seats`)
       .then(res => setZones(res.data.data.zones))
       .catch(err => console.error(err))
       .finally(() => setLoading(false));
+
+    // WebSocket 연결
+    const client = new Client({
+      webSocketFactory: () => new SockJS(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/ws/seats`),
+      onConnect: () => {
+        client.subscribe(`/topic/seats/${gameId}`, (message) => {
+          const data = JSON.parse(message.body);
+          // 실시간 좌석 상태 업데이트
+          setZones(prev => prev.map(zone => ({
+            ...zone,
+            seats: zone.seats.map(seat =>
+              seat.seatId === data.seatId
+                ? { ...seat, status: data.status }
+                : seat
+            )
+          })));
+        });
+      },
+    });
+
+    client.activate();
+    stompClient.current = client;
+
+    return () => {
+      client.deactivate();
+    };
   }, [gameId]);
 
   const toggleSeat = (seatId: string) => {

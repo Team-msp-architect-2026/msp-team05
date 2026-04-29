@@ -16,6 +16,7 @@ export default function LoginPage() {
     try {
       const res = await api.post('/api/auth/login', form);
       localStorage.setItem('accessToken', res.data.data.accessToken);
+      localStorage.setItem('refreshToken', res.data.data.refreshToken);
       navigate('/');
     } catch (err) {
       setError('이메일 또는 비밀번호가 올바르지 않습니다.');

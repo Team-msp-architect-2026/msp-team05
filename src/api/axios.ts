@@ -16,14 +16,44 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// 응답 인터셉터 - 에러 처리
+// 응답 인터셉터 - 토큰 만료 시 자동 갱신
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('accessToken');
-      window.location.href = '/login';
+  async (error) => {
+    const originalRequest = error.config;
+
+    // 401 에러이고 재시도 안 한 경우
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (!refreshToken) {
+          throw new Error('No refresh token');
+        }
+
+        // 토큰 갱신 요청
+        const res = await axios.post(
+          `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/auth/refresh`,
+          {},
+          { headers: { Authorization: `Bearer ${refreshToken}` } }
+        );
+
+        const newAccessToken = res.data.data.accessToken;
+        localStorage.setItem('accessToken', newAccessToken);
+
+        // 원래 요청 재시도
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        // 갱신 실패 시 로그아웃
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
+      }
     }
+
     return Promise.reject(error);
   }
 );

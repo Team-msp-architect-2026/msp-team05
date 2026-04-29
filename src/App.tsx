@@ -4,6 +4,7 @@ import MainPage from './pages/MainPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import GameDetailPage from './pages/GameDetailPage';
+import QueuePage from './pages/QueuePage';
 import SeatSelectPage from './pages/SeatSelectPage';
 import CheckoutPage from './pages/CheckoutPage';
 import ReservationPage from './pages/ReservationPage';
@@ -18,6 +19,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/games/:gameId" element={<GameDetailPage />} />
+        <Route path="/games/:gameId/queue" element={<QueuePage />} />
         <Route path="/games/:gameId/seats" element={<SeatSelectPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/reservations" element={<ReservationPage />} />
