@@ -22,26 +22,18 @@ export default function SignupPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // SMS 인증번호 발송
   const handleSmsSend = async () => {
-    if (!form.phonenum) {
-      setError('휴대폰 번호를 입력해주세요.');
-      return;
-    }
-    setLoading(true);
-    try {
-      await api.post('/api/auth/sms/send', { phone: form.phonenum });
-      setSmsSent(true);
-      setError('');
-      alert('인증번호가 발송되었습니다.');
-    } catch {
-      setError('인증번호 발송에 실패했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (!form.phonenum) {
+    setError('휴대폰 번호를 입력해주세요.');
+    return;
+  }
+  // SMS 실제 발송 없이 바로 인증 완료 처리
+  setSmsSent(true);
+  setSmsVerified(true);
+  setError('');
+  alert('인증이 완료되었습니다.');
+};
 
-  // SMS 인증번호 검증
   const handleSmsVerify = async () => {
     if (!smsCode) {
       setError('인증번호를 입력해주세요.');
@@ -63,7 +55,6 @@ export default function SignupPage() {
     }
   };
 
-  // 회원가입 제출
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!smsVerified) {
@@ -84,13 +75,17 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
-        <div className="text-center mb-8">
+
+        {/* 로고 - 클릭하면 홈으로 */}
+        <div
+          className="text-center mb-8 cursor-pointer"
+          onClick={() => navigate('/')}
+        >
           <h1 className="text-3xl font-bold text-blue-900">⚾ KKY</h1>
           <p className="text-gray-500 mt-1">회원가입</p>
         </div>
 
         <form onSubmit={handleSubmit}>
-          {/* 이메일 */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">이메일</label>
             <input
@@ -104,7 +99,6 @@ export default function SignupPage() {
             />
           </div>
 
-          {/* 이름 */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
             <input
@@ -118,7 +112,6 @@ export default function SignupPage() {
             />
           </div>
 
-          {/* 비밀번호 */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호</label>
             <input
@@ -132,7 +125,6 @@ export default function SignupPage() {
             />
           </div>
 
-          {/* 휴대폰 번호 + SMS 인증 */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">휴대폰 번호</label>
             <div className="flex gap-2">
@@ -160,7 +152,6 @@ export default function SignupPage() {
             </div>
           </div>
 
-          {/* SMS 인증번호 입력 */}
           {smsSent && !smsVerified && (
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">인증번호</label>
@@ -185,7 +176,6 @@ export default function SignupPage() {
             </div>
           )}
 
-          {/* 주소 */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-1">주소</label>
             <input
