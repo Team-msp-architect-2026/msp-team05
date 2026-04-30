@@ -24,20 +24,22 @@
 
 ---
 
+<br>
+
 > 🔴 **핵심 목표**: AWS WAF Bot Control 단독 도입 가능성 실증
 > 야구 티켓 예매 모의 플랫폼을 배경으로 **봇 탐지율(TPR) / 오탐율(FPR)** 을 정량 측정합니다.
 
 </div>
 
----
+<br>
 
 ## 👥 팀원
 
 | 역할 | 이름 | 주요 담당 | GitHub |
 |------|------|-----------|--------|
-| 팀장 |  | 인프라 · AWS WAF · EC2 · ALB | @ |
-| 팀원 |  | Backend · DB · Redis · WebSocket | @ |
-| 팀원 |  | Frontend · UX · React | @ |
+| 팀장 | 김재훈 | Backend | @ |
+| 팀원 | 김수경 | Backend | @ |
+| 팀원 | 양준표 | Frontend| @ |
 
 ---
 
@@ -52,28 +54,11 @@
 
 ## 🏗️ 시스템 아키텍처
 
-```mermaid
-flowchart LR
-    User[👤 사용자] -->|HTTPS| WAF[🛡️ AWS WAF\nBot Control]
-    Bot[🤖 봇 스크립트] -->|공격 트래픽| WAF
-    WAF --> ALB[⚖️ AWS ALB]
-    ALB --> FE[🖥️ Frontend\nReact + Vite]
-    ALB --> BE[⚙️ Backend\nSpring Boot]
-    BE --> RDS[(🗄️ MySQL\nAWS RDS)]
-    BE --> Redis[(⚡ Redis\n좌석 선점 TTL)]
-    BE -->|WebSocket STOMP| FE
 
-    subgraph AWS[☁️ AWS Cloud]
-        WAF
-        ALB
-        subgraph EC2[🖥️ EC2 Instance]
-            FE
-            BE
-        end
-        RDS
-        Redis
-    end
-```
+<img width="697" height="623" alt="image" src="https://github.com/user-attachments/assets/a3839492-dcc8-4cbf-bdff-f18197493710" />
+
+<br>
+
 
 > 📖 상세 아키텍처는 [Wiki — 시스템 아키텍처](../../wiki/10-시스템-아키텍처) 참조
 
