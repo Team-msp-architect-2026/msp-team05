@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚾ KBO 야구 티켓팅 플랫폼
+# ⚾ KKY 야구 티켓팅 플랫폼
 ### AWS WAF Bot Control 기술 검증 프로젝트
 
 **MSP Architect Training 2026 · Team 05**
