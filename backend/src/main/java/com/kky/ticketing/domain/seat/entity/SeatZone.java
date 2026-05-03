@@ -1,8 +1,8 @@
-package com.kky.ticketing.domain.entity;
+package com.kky.ticketing.domain.seat.entity;
 
+import com.kky.ticketing.domain.game.entity.Stadium;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Table(name = "seat_zones")
@@ -12,9 +12,8 @@ import org.hibernate.annotations.UuidGenerator;
 @Builder
 public class SeatZone {
     @Id
-    @UuidGenerator
-    @Column(columnDefinition = "VARCHAR(36)")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stadium_id", nullable = false)

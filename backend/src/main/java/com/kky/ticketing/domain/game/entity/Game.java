@@ -1,8 +1,7 @@
-package com.kky.ticketing.domain.entity;
+package com.kky.ticketing.domain.game.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.UuidGenerator;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,9 +12,8 @@ import java.time.LocalDateTime;
 @Builder
 public class Game {
     @Id
-    @UuidGenerator
-    @Column(columnDefinition = "VARCHAR(36)")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "home_team_id", nullable = false)

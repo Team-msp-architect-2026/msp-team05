@@ -24,11 +24,11 @@ public class AdminRequest {
     @Getter
     public static class GameCreate {
         @NotNull
-        private Long homeTeamId;
+        private String homeTeamId;
         @NotNull
-        private Long awayTeamId;
+        private String awayTeamId;
         @NotNull
-        private Long stadiumId;
+        private String stadiumId;
         @NotNull
         private LocalDateTime startTime;
         private LocalDateTime ticketOpenTime;
@@ -37,7 +37,7 @@ public class AdminRequest {
     @Getter
     public static class ZoneCreate {
         @NotNull
-        private Long stadiumId;
+        private String stadiumId;
         @NotBlank
         private String zoneName;
         @NotNull
@@ -49,7 +49,7 @@ public class AdminRequest {
     @Getter
     public static class SeatCreate {
         @NotNull
-        private Long zoneId;
+        private String zoneId;
         @NotBlank
         private String row;
         @NotBlank

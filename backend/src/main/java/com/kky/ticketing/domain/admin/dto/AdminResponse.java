@@ -8,7 +8,7 @@ public class AdminResponse {
 
     @Getter @Builder
     public static class TeamInfo {
-        private Long teamId;
+        private String teamId;
         private String name;
         private String logoUrl;
 
@@ -23,7 +23,7 @@ public class AdminResponse {
 
     @Getter @Builder
     public static class StadiumInfo {
-        private Long stadiumId;
+        private String stadiumId;
         private String name;
         private String address;
 
@@ -38,7 +38,7 @@ public class AdminResponse {
 
     @Getter @Builder
     public static class GameInfo {
-        private Long gameId;
+        private String gameId;
         private String homeTeam;
         private String awayTeam;
         private String stadium;
@@ -59,7 +59,7 @@ public class AdminResponse {
 
     @Getter @Builder
     public static class ZoneInfo {
-        private Long zoneId;
+        private String zoneId;
         private String zoneName;
         private Integer price;
         private Integer totalSeats;
@@ -76,7 +76,7 @@ public class AdminResponse {
 
     @Getter @Builder
     public static class SeatInfo {
-        private Long seatId;
+        private String seatId;
         private String row;
         private String number;
         private String status;

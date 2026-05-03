@@ -1,8 +1,7 @@
-package com.kky.ticketing.domain.entity;
+package com.kky.ticketing.domain.game.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Table(name = "stadiums")
@@ -12,9 +11,8 @@ import org.hibernate.annotations.UuidGenerator;
 @Builder
 public class Stadium {
     @Id
-    @UuidGenerator
-    @Column(columnDefinition = "VARCHAR(36)")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false)
     private String name;
