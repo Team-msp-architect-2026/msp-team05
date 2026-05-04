@@ -25,13 +25,13 @@ public class PaymentService {
     private final RedisTemplate<String, String> redisTemplate;
 
     @Transactional
-    public Map<String, Object> prepare(Long userId, PaymentPrepareRequest req) {
+    public Map<String, Object> prepare(String userEmail, PaymentPrepareRequest req) {
         String lockData = redisTemplate.opsForValue().get("lock:" + req.getLockToken());
         if (lockData == null) {
             throw new BusinessException(400, "INVALID_LOCK_TOKEN");
         }
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new BusinessException(401, "USER_NOT_FOUND"));
 
         String orderId = UUID.randomUUID().toString();

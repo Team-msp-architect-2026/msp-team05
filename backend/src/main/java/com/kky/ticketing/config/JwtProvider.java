@@ -27,9 +27,9 @@ public class JwtProvider {
         this.refreshTokenExpiration = refreshTokenExpiration;
     }
 
-    public String generateAccessToken(Long userId, String role) {
+    public String generateAccessToken(String email, String role) {
         return Jwts.builder()
-                .subject(String.valueOf(userId))
+                .subject(email)
                 .claim("role", role)
                 .claim("type", "access")
                 .issuedAt(new Date())
@@ -38,9 +38,9 @@ public class JwtProvider {
                 .compact();
     }
 
-    public String generateRefreshToken(Long userId) {
+    public String generateRefreshToken(String email) {
         return Jwts.builder()
-                .subject(String.valueOf(userId))
+                .subject(email)
                 .claim("type", "refresh")
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
@@ -58,8 +58,8 @@ public class JwtProvider {
         }
     }
 
-    public Long getUserId(String token) {
-        return Long.parseLong(parseToken(token).getSubject());
+    public String getEmail(String token) {
+        return parseToken(token).getSubject();
     }
 
     public String getRole(String token) {

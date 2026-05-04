@@ -20,29 +20,29 @@ public class ReservationController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<Map<String, Object>>> create(
-            @AuthenticationPrincipal Long userId,
+            @AuthenticationPrincipal String userEmail,
             @Valid @RequestBody ReservationRequest req) {
-        return ResponseEntity.ok(ApiResponse.ok(reservationService.create(userId, req)));
+        return ResponseEntity.ok(ApiResponse.ok(reservationService.create(userEmail, req)));
     }
 
     @GetMapping
     public ResponseEntity<ApiResponse<Map<String, Object>>> getMyReservations(
-            @AuthenticationPrincipal Long userId) {
-        return ResponseEntity.ok(ApiResponse.ok(reservationService.getMyReservations(userId)));
+            @AuthenticationPrincipal String userEmail) {
+        return ResponseEntity.ok(ApiResponse.ok(reservationService.getMyReservations(userEmail)));
     }
 
     @GetMapping("/{reservationId}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getDetail(
-            @AuthenticationPrincipal Long userId,
-            @PathVariable Long reservationId) {
-        return ResponseEntity.ok(ApiResponse.ok(reservationService.getDetail(userId, reservationId)));
+            @AuthenticationPrincipal String userEmail,
+            @PathVariable String reservationId) {
+        return ResponseEntity.ok(ApiResponse.ok(reservationService.getDetail(userEmail, reservationId)));
     }
 
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<ApiResponse<Void>> cancel(
-            @AuthenticationPrincipal Long userId,
-            @PathVariable Long reservationId) {
-        reservationService.cancel(userId, reservationId);
+            @AuthenticationPrincipal String userEmail,
+            @PathVariable String reservationId) {
+        reservationService.cancel(userEmail, reservationId);
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
 }

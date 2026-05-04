@@ -48,11 +48,11 @@ public class AuthService {
             throw new BusinessException(401, "INVALID_CREDENTIALS");
         }
 
-        String accessToken = jwtProvider.generateAccessToken(user.getId(), user.getRole().name());
-        String refreshToken = jwtProvider.generateRefreshToken(user.getId());
+        String accessToken = jwtProvider.generateAccessToken(user.getEmail(), user.getRole().name());
+        String refreshToken = jwtProvider.generateRefreshToken(user.getEmail());
 
         redisTemplate.opsForValue()
-                .set("refresh:" + user.getId(), refreshToken, Duration.ofDays(7));
+                .set("refresh:" + user.getEmail(), refreshToken, Duration.ofDays(7));
 
         return Map.of(
                 "accessToken", accessToken,

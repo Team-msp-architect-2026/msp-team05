@@ -25,10 +25,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String token = extractToken(request);
         if (StringUtils.hasText(token) && jwtProvider.validateToken(token)) {
-            Long userId = jwtProvider.getUserId(token);
+            String email = jwtProvider.getEmail(token);
             String role = jwtProvider.getRole(token);
             var auth = new UsernamePasswordAuthenticationToken(
-                    userId,
+                    email,
                     null,
                     List.of(new SimpleGrantedAuthority("ROLE_" + role))
             );

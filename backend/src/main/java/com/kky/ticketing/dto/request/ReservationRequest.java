@@ -10,8 +10,8 @@ public class ReservationRequest {
     @NotBlank
     private String lockToken;
 
-    @NotNull
-    private Long paymentId;
+    @NotBlank
+    private String paymentId;
 
     @NotBlank
     private String ticketType;

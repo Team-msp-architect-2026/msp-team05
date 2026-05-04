@@ -35,7 +35,7 @@ public class ReservationService {
     private final ObjectMapper objectMapper;
 
     @Transactional
-    public Map<String, Object> create(Long userId, ReservationRequest req) {
+    public Map<String, Object> create(String userEmail, ReservationRequest req) {
         String lockData = redisTemplate.opsForValue().get("lock:" + req.getLockToken());
         if (lockData == null) throw new BusinessException(400, "INVALID_LOCK_TOKEN");
 
@@ -44,7 +44,7 @@ public class ReservationService {
         if (payment.getStatus() != Payment.PaymentStatus.PAID)
             throw new BusinessException(400, "PAYMENT_NOT_CONFIRMED");
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new BusinessException(401, "USER_NOT_FOUND"));
 
         String reservationNumber = "KKY-"
@@ -66,8 +66,8 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Object> getMyReservations(Long userId) {
-        List<Map<String, Object>> list = reservationRepository.findByUserId(userId).stream()
+    public Map<String, Object> getMyReservations(String userEmail) {
+        List<Map<String, Object>> list = reservationRepository.findByUserEmail(userEmail).stream()
                 .map(r -> {
                     Map<String, Object> item = new LinkedHashMap<>();
                     item.put("reservationId", String.valueOf(r.getId()));
@@ -84,11 +84,11 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Object> getDetail(Long userId, Long reservationId) {
+    public Map<String, Object> getDetail(String userEmail, String reservationId) {
         Reservation r = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new BusinessException(404, "RESERVATION_NOT_FOUND"));
 
-        if (!r.getUser().getId().equals(userId))
+        if (!r.getUser().getEmail().equals(userEmail))
             throw new BusinessException(403, "FORBIDDEN");
 
         List<String> seatIds = parseSeatIds(r.getSeatData());
@@ -116,11 +116,11 @@ public class ReservationService {
     }
 
     @Transactional
-    public void cancel(Long userId, Long reservationId) {
+    public void cancel(String userEmail, String reservationId) {
         Reservation r = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new BusinessException(404, "RESERVATION_NOT_FOUND"));
 
-        if (!r.getUser().getId().equals(userId))
+        if (!r.getUser().getEmail().equals(userEmail))
             throw new BusinessException(403, "FORBIDDEN");
 
         if (r.getStatus() == Reservation.ReservationStatus.CANCELLED)

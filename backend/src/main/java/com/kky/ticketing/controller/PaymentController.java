@@ -21,9 +21,9 @@ public class PaymentController {
 
     @PostMapping("/prepare")
     public ResponseEntity<ApiResponse<Map<String, Object>>> prepare(
-            @AuthenticationPrincipal Long userId,
+            @AuthenticationPrincipal String userEmail,
             @Valid @RequestBody PaymentPrepareRequest req) {
-        return ResponseEntity.ok(ApiResponse.ok(paymentService.prepare(userId, req)));
+        return ResponseEntity.ok(ApiResponse.ok(paymentService.prepare(userEmail, req)));
     }
 
     @PostMapping("/confirm")
