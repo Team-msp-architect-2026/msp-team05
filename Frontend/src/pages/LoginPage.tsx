@@ -25,6 +25,20 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4">
+      {/* 왼쪽 위 로고 */}
+      <div className="py-4">
+        <div
+          className="flex items-center gap-2 cursor-pointer w-fit"
+          onClick={() => navigate('/')}
+        >
+          <span className="text-2xl">⚾</span>
+          <span className="text-xl font-bold text-blue-900">KKY 티켓팅</span>
+        </div>
+      </div>
+
+      {/* 나머지 중앙 콘텐츠 */}
+      <div className="flex flex-col items-center justify-center flex-1">
+
 
       {/* 로고 */}
       <div className="mb-8 text-center">
