@@ -127,6 +127,7 @@ export default function LoginPage() {
       <p className="mt-8 text-xs text-gray-400 text-center">
         개인정보 처리 사항은 개인정보처리방침에서 확인하세요.
       </p>
+      </div>
     </div>
   );
 }
