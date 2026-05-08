@@ -39,7 +39,6 @@ export default function LoginPage() {
       {/* 나머지 중앙 콘텐츠 */}
       <div className="flex flex-col items-center justify-center flex-1">
 
-
       {/* 로고 */}
       <div className="mb-8 text-center">
         <h1 className="text-4xl font-bold text-blue-900">⚾ KKY</h1>
