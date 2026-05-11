@@ -1,0 +1,70 @@
+variable "aws_region" {
+  description = "AWS 리전"
+  type        = string
+  default     = "eu-west-2"
+}
+
+variable "project_name" {
+  description = "프로젝트 이름"
+  type        = string
+  default     = "kky"
+}
+
+variable "environment" {
+  description = "환경"
+  type        = string
+  default     = "prod"
+}
+
+variable "vpc_cidr" {
+  description = "VPC CIDR 블록"
+  type        = string
+  default     = "10.0.0.0/16"
+}
+
+variable "public_subnet_cidrs" {
+  description = "퍼블릭 서브넷 CIDR 목록"
+  type        = list(string)
+  default     = ["10.0.1.0/24", "10.0.2.0/24"]
+}
+
+variable "private_subnet_was_cidrs" {
+  description = "프라이빗 서브넷 WAS CIDR 목록"
+  type        = list(string)
+  default     = ["10.0.11.0/24", "10.0.12.0/24"]
+}
+
+variable "private_subnet_db_cidrs" {
+  description = "프라이빗 서브넷 DB CIDR 목록"
+  type        = list(string)
+  default     = ["10.0.21.0/24", "10.0.22.0/24"]
+}
+
+variable "availability_zones" {
+  description = "가용 영역 목록"
+  type        = list(string)
+  default     = ["eu-west-2a", "eu-west-2c"]
+}
+
+variable "ami_id" {
+  description = "EC2 AMI ID"
+  type        = string
+}
+
+variable "certificate_arn" {
+  description = "ACM certificate ARN for HTTPS"
+  type        = string
+  default     = ""
+}
+
+variable "db_password" {
+  description = "RDS 마스터 비밀번호"
+  type        = string
+  sensitive   = true
+}
+
+variable "jwt_secret" {
+  description = "JWT Secret Key"
+  type        = string
+  sensitive   = true
+}
