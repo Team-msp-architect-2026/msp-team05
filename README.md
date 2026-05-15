@@ -1,7 +1,7 @@
 <div align="center">
 
-# ⚾ KKY 야구 티켓팅 플랫폼
-### AWS WAF Bot Control 기술 검증 프로젝트
+# ⚾ KKY 야구 티켓팅
+### AWS WAF Bot Control 매크로 봇 방어 실측 프로젝트
 **MSP Architect Training 2026 · Team 05**
 
 ---
