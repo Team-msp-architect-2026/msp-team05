@@ -2,27 +2,23 @@
 
 # ⚾ KKY 야구 티켓팅 플랫폼
 ### AWS WAF Bot Control 기술 검증 프로젝트
-
 **MSP Architect Training 2026 · Team 05**
 
 ---
 
-![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20PWA-brightgreen?style=for-the-badge&logo=googlechrome)
-![Backend](https://img.shields.io/badge/Backend-Spring%20Boot%203.2-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
-![Frontend](https://img.shields.io/badge/Frontend-React%2019%20%7C%20TypeScript-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![Backend](https://img.shields.io/badge/Backend-Spring%20Boot%203.x-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![Frontend](https://img.shields.io/badge/Frontend-React%20%7C%20TypeScript-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![Database](https://img.shields.io/badge/Database-MySQL%20%7C%20Redis-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
-
 ![Infra](https://img.shields.io/badge/Infra-AWS%20EC2%20%7C%20RDS%20%7C%20ALB-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
 ![WAF](https://img.shields.io/badge/Security-AWS%20WAF%20Bot%20Control-DD344C?style=for-the-badge&logo=amazonaws&logoColor=white)
+![CloudFront](https://img.shields.io/badge/CDN-CloudFront%20%7C%20JA4%20Fingerprinting-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
 ![WebSocket](https://img.shields.io/badge/Realtime-WebSocket%20STOMP-010101?style=for-the-badge&logo=socketdotio)
 ![Redis](https://img.shields.io/badge/Cache-Redis%20분산락-DC382D?style=for-the-badge&logo=redis&logoColor=white)
-
-![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions%20%7C%20ArgoCD%20GitOps-red?style=for-the-badge&logo=githubactions&logoColor=white)
-![Load Test](https://img.shields.io/badge/LoadTest-K6%20%7C%20HPA-yellow?style=for-the-badge&logo=k6&logoColor=white)
-![Monitoring](https://img.shields.io/badge/Monitoring-CloudWatch%20%7C%20Grafana-F46800?style=for-the-badge&logo=grafana&logoColor=white)
+![IaC](https://img.shields.io/badge/IaC-Terraform-844FBA?style=for-the-badge&logo=terraform&logoColor=white)
+![Monitoring](https://img.shields.io/badge/Monitoring-CloudWatch%20%7C%20Athena-F46800?style=for-the-badge&logo=amazonaws&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
 
----
+</div>
 
 <br>
 
