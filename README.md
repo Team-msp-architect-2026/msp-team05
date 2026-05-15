@@ -8,8 +8,9 @@
 
 ![Frontend](https://img.shields.io/badge/Frontend-React%20%7C%20TypeScript-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![Backend](https://img.shields.io/badge/Backend-Spring%20Boot%203.2.4-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![Database](https://img.shields.io/badge/Database-MySQL%20%7C%20Redis-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 ![Infra](https://img.shields.io/badge/Infra-AWS%20%7C%20Terraform-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
-![Deploy](https://img.shields.io/badge/Deploy-Docker%20%7C%20EC2-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Deploy](https://img.shields.io/badge/Deploy-Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![WAF](https://img.shields.io/badge/WAF-Bot%20Control%20%7C%20JA4%20Fingerprinting-DD344C?style=for-the-badge&logo=amazonaws&logoColor=white)
 ![Monitoring](https://img.shields.io/badge/Monitoring-CloudWatch%20%7C%20Athena-F46800?style=for-the-badge&logo=amazonaws&logoColor=white)
 
