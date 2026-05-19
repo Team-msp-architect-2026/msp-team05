@@ -47,7 +47,7 @@
 ## 🏗️ 시스템 아키텍처
 
 
-<img width="419" height="373" alt="image" src="https://github.com/user-attachments/assets/af8a88f2-eb6d-4483-807b-077c775de854" />
+<img width="850" height="850" alt="image" src="https://github.com/user-attachments/assets/af8a88f2-eb6d-4483-807b-077c775de854" />
 
 
 <br>
