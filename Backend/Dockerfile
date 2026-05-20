@@ -6,7 +6,7 @@ FROM gradle:8.7-jdk17 AS build
 WORKDIR /app
 
 # 의존성 캐시 레이어 (소스 변경 시 재다운로드 방지)
-COPY build.gradle settings.gradle ./
+COPY build.gradle ./
 COPY gradle ./gradle
 RUN gradle dependencies --no-daemon || true
 
@@ -36,7 +36,6 @@ USER appuser
 EXPOSE 8080
 
 # 실행
-ENTRYPOINT ["java", "-jar", \
-  "-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE:prod}", \
+ENTRYPOINT ["java", \
   "-Djava.security.egd=file:/dev/./urandom", \
-  "app.jar"]
+  "-jar", "app.jar"]
