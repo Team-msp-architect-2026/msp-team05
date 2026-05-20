@@ -17,7 +17,13 @@ export default function LoginPage() {
       const res = await api.post('/api/auth/login', form);
       localStorage.setItem('accessToken', res.data.data.accessToken);
       localStorage.setItem('refreshToken', res.data.data.refreshToken);
-      navigate('/');
+
+      const role = res.data.data.role;
+      if (role === 'ADMIN') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       setError('이메일 또는 비밀번호가 올바르지 않습니다.');
     }

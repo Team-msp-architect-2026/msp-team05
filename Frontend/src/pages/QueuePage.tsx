@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../api/axios';
 import Navbar from '../components/Navbar';
@@ -17,9 +17,12 @@ export default function QueuePage() {
   const [queueStatus, setQueueStatus] = useState<QueueStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const hasEntered = useRef(false);
 
   // 대기열 진입
   useEffect(() => {
+    if (hasEntered.current) return;
+    hasEntered.current = true;
 
     const token = localStorage.getItem('accessToken');
     if (!token) {
@@ -30,8 +33,9 @@ export default function QueuePage() {
 
     api.post('/api/queue/enter', { gameId })
       .then(res => {
-        const token = res.data.data.queueToken;
-        setQueueToken(token);
+        const qToken = res.data.data.queueToken;
+        setQueueToken(qToken);
+        localStorage.setItem('queueToken', qToken);
         setQueueStatus({
           position: res.data.data.position,
           estimatedWaitSeconds: res.data.data.estimatedWaitSeconds,
@@ -39,7 +43,13 @@ export default function QueuePage() {
           entryAllowed: false,
         });
       })
-      .catch(() => setError('대기열 진입에 실패했습니다.'))
+      .catch((err) => {
+        if (err.response?.status === 409) {
+          setError('이미 대기열에 진입한 경기입니다. 기존 창을 확인해주세요.');
+        } else {
+          setError('대기열 진입에 실패했습니다.');
+        }
+      })
       .finally(() => setLoading(false));
   }, [gameId]);
 
@@ -132,8 +142,10 @@ export default function QueuePage() {
 
             <div className="flex items-center justify-center gap-2 mb-6">
               <div className="w-2 h-2 bg-blue-900 rounded-full animate-bounce"></div>
-              <div className="w-2 h-2 bg-blue-900 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-              <div className="w-2 h-2 bg-blue-900 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              <div className="w-2 h-2 bg-blue-900 rounded-full animate-bounce"
+                style={{ animationDelay: '0.1s' }}></div>
+              <div className="w-2 h-2 bg-blue-900 rounded-full animate-bounce"
+                style={{ animationDelay: '0.2s' }}></div>
             </div>
 
             <button
