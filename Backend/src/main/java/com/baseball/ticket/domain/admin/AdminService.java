@@ -1,5 +1,6 @@
 package com.baseball.ticket.domain.admin;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.baseball.ticket.domain.admin.dto.AdminRequest;
@@ -53,13 +54,20 @@ public class AdminService {
         Stadium stadium = stadiumRepository.findById(req.getStadiumId())
                 .orElseThrow(() -> new IllegalArgumentException("구장을 찾을 수 없습니다."));
 
+        // ticketOpenTime이 현재 시간 이전이면 ON_SALE, 아니면 SCHEDULED
+        Game.GameStatus status = Game.GameStatus.SCHEDULED;
+        if (req.getTicketOpenTime() != null
+                && !req.getTicketOpenTime().isAfter(LocalDateTime.now())) {
+            status = Game.GameStatus.ON_SALE;
+        }
+
         Game game = Game.builder()
                 .homeTeam(homeTeam)
                 .awayTeam(awayTeam)
                 .stadium(stadium)
                 .startTime(req.getStartTime())
                 .ticketOpenTime(req.getTicketOpenTime())
-                .status(Game.GameStatus.SCHEDULED)
+                .status(status)
                 .build();
         return AdminResponse.GameInfo.from(gameRepository.save(game));
     }
@@ -74,7 +82,27 @@ public class AdminService {
                 .price(req.getPrice())
                 .totalSeats(req.getTotalSeats())
                 .build();
-        return AdminResponse.ZoneInfo.from(seatZoneRepository.save(zone));
+        seatZoneRepository.save(zone);
+
+        int seatsPerRow = 10;
+        int rows = (int) Math.ceil((double) req.getTotalSeats() / seatsPerRow);
+        int count = 0;
+
+        for (int r = 0; r < rows && count < req.getTotalSeats(); r++) {
+            String rowName = String.valueOf((char) ('A' + r));
+            for (int n = 1; n <= seatsPerRow && count < req.getTotalSeats(); n++) {
+                Seat seat = Seat.builder()
+                        .zone(zone)
+                        .rowNum(rowName)
+                        .number(String.valueOf(n))
+                        .status("AVAILABLE")
+                        .build();
+                seatRepository.save(seat);
+                count++;
+            }
+        }
+
+        return AdminResponse.ZoneInfo.from(zone);
     }
 
     public AdminResponse.SeatInfo createSeat(AdminRequest.SeatCreate req) {
@@ -99,6 +127,12 @@ public class AdminService {
     public List<AdminResponse.StadiumInfo> getStadiums() {
         return stadiumRepository.findAll().stream()
                 .map(AdminResponse.StadiumInfo::from)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    public List<AdminResponse.ZoneInfo> getZones(String stadiumId) {
+        return seatZoneRepository.findByStadiumId(stadiumId).stream()
+                .map(AdminResponse.ZoneInfo::from)
                 .collect(java.util.stream.Collectors.toList());
     }
 }

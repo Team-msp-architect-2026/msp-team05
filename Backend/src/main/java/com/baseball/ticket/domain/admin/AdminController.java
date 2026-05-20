@@ -56,4 +56,10 @@ public class AdminController {
     public ResponseEntity<ApiResponse<List<AdminResponse.StadiumInfo>>> getStadiums() {
         return ResponseEntity.ok(ApiResponse.ok(adminService.getStadiums()));
     }
+
+    @GetMapping("/zones")
+    public ResponseEntity<ApiResponse<List<AdminResponse.ZoneInfo>>> getZones(
+            @RequestParam String stadiumId) {
+        return ResponseEntity.ok(ApiResponse.ok(adminService.getZones(stadiumId)));
+    }
 }

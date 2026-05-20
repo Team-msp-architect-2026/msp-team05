@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Seats", description = "좌석 조회 및 선점 API")
@@ -54,19 +53,13 @@ public class SeatController {
     public ResponseEntity<ApiResponse<SeatLockResponse>> lockSeats(
             @PathVariable String gameId,
             @Valid @RequestBody SeatLockRequest request,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal String email) {
 
-        // JWT 없을 때 임시 처리
-        String email = userDetails != null
-                ? userDetails.getUsername()
-                : "test@test.com";
+        if (email == null) {
+            throw new com.baseball.ticket.global.exception.BusinessException("UNAUTHORIZED", 401);
+        }
 
-        SeatLockResponse response = seatService.lockSeats(
-                gameId, request, email);
-
-
-        //SeatLockResponse response = seatService.lockSeats(
-        //        gameId, request, userDetails.getUsername());
+        SeatLockResponse response = seatService.lockSeats(gameId, request, email);
         return ResponseEntity.ok(ApiResponse.ok(response));
     }
 }

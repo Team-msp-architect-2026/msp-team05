@@ -17,8 +17,8 @@ public class GameListResponse {
     private TeamInfo awayTeam;
     private StadiumInfo stadium;
     private LocalDateTime startTime;
+    private LocalDateTime ticketOpenTime;
     private String status;
-    private int remainingSeats;
 
     @Getter
     @Builder
@@ -38,7 +38,7 @@ public class GameListResponse {
     }
 
     // Entity → DTO 변환
-    public static GameListResponse from(Game game, int remainingSeats) {
+    public static GameListResponse from(Game game) {
         return GameListResponse.builder()
                 .gameId(game.getId())
                 .homeTeam(TeamInfo.builder()
@@ -56,8 +56,8 @@ public class GameListResponse {
                         .name(game.getStadium().getName())
                         .build())
                 .startTime(game.getStartTime())
+                .ticketOpenTime(game.getTicketOpenTime())
                 .status(game.getStatus().name())
-                .remainingSeats(remainingSeats)
                 .build();
     }
 }

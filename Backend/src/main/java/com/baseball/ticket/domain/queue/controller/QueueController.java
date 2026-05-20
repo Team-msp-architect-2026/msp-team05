@@ -4,6 +4,7 @@ import com.baseball.ticket.domain.queue.dto.QueueEnterRequest;
 import com.baseball.ticket.domain.queue.dto.QueueEnterResponse;
 import com.baseball.ticket.domain.queue.dto.QueueStatusResponse;
 import com.baseball.ticket.domain.queue.service.QueueService;
+import com.baseball.ticket.global.exception.BusinessException;
 import com.baseball.ticket.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,15 +28,13 @@ public class QueueController {
     @PostMapping("/enter")
     public ResponseEntity<ApiResponse<QueueEnterResponse>> enter(
             @Valid @RequestBody QueueEnterRequest request,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal String email) {
 
-        // 테스트용 — JWT 없을 때 임시 이메일 사용
-        String email = userDetails != null
-                ? userDetails.getUsername()
-                : "test@test.com";
+        if (email == null) {
+            throw new BusinessException("UNAUTHORIZED", 401);
+        }
 
-        QueueEnterResponse response =
-                queueService.enter(request, email);
+        QueueEnterResponse response = queueService.enter(request, email);
         return ResponseEntity.ok(ApiResponse.ok(response));
     }
 

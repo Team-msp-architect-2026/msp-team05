@@ -29,10 +29,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-    // WebSocket (대기열)
+    // WebSocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
-    // Redis (좌석 선점 TTL)
+    // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     // JWT
@@ -43,21 +43,31 @@ dependencies {
     // Swagger UI
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 
-    // MySQL
-    //runtimeOnly 'com.mysql:mysql-connector-j'
+    // H2 (개발용)
     runtimeOnly 'com.h2database:h2'
 
-    // Lombok
+    // MySQL (운영용)
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+
+
+    implementation platform('software.amazon.awssdk:bom:2.25.0')
+
+
+    implementation 'software.amazon.awssdk:secretsmanager'
+
+
+    implementation 'software.amazon.awssdk:sts'
+
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
-
-

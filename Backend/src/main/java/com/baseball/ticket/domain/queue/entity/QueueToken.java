@@ -50,4 +50,8 @@ public class QueueToken {
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
+
+    public void updateStatus(String status) {
+        this.status = status;
+    }
 }

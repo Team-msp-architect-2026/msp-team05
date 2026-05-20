@@ -26,8 +26,14 @@ public interface SeatRepository extends JpaRepository<Seat, String> {
             "AND s.status = 'AVAILABLE'")
     int countAvailableByStadiumId(@Param("stadiumId") String stadiumId);
 
+    @Query("SELECT COUNT(s) FROM Seat s WHERE s.zone.id = :zoneId AND s.status = 'AVAILABLE'")
+    int countAvailableByZoneId(@Param("zoneId") String zoneId);
+
+    /*
     @Query("SELECT COUNT(s) FROM Seat s " +
             "WHERE s.zone.id = :zoneId " +
             "AND s.status = 'AVAILABLE'")
     int countAvailableByZoneId(@Param("zoneId") String zoneId);
+
+     */
 }

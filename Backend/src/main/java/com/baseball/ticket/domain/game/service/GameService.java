@@ -41,12 +41,16 @@ public class GameService {
         Page<Game> games = gameRepository.findGamesWithFilter(
                 localDate, teamId, stadiumId, pageable);
 
+        return games.map(GameListResponse::from);
+
+        /*
         return games.map(game -> {
             // AVAILABLE 좌석 수로 계산
             int remaining = seatRepository
                     .countAvailableByStadiumId(game.getStadium().getId());
-            return GameListResponse.from(game, remaining);
+            return GameListResponse.from(game);
         });
+        */
     }
 
     // ─────────────────────────────────────────
@@ -67,7 +71,10 @@ public class GameService {
                         .zoneId(zone.getId())
                         .zoneName(zone.getZoneName())
                         .price(zone.getPrice())
-                        .remainingSeats(zone.getTotalSeats())
+                        // totalSeats → 실제 AVAILABLE 좌석 수로 변경
+                        .remainingSeats(
+                                seatRepository.countAvailableByZoneId(zone.getId())
+                        )
                         .build())
                 .collect(Collectors.toList());
 
