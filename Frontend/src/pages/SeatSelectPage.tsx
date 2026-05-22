@@ -124,7 +124,6 @@ export default function SeatSelectPage() {
 
         setSeats(seatList);
 
-        // 잔여 좌석 수 업데이트
         setZones(prev => prev.map(z => {
           const found = zoneList.find((zone: any) => zone.zoneId === z.zoneId);
           if (!found) return z;
@@ -148,7 +147,6 @@ export default function SeatSelectPage() {
           setSeats(prev => prev.map(seat =>
             seat.seatId === data.seatId ? { ...seat, status: data.status } : seat
           ));
-          // 잔여 좌석 수 실시간 업데이트
           setZones(prev => prev.map(zone => {
             const seatInZone = zone.zoneId === data.zoneId;
             if (!seatInZone) return zone;

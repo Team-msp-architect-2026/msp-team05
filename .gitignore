@@ -3,6 +3,7 @@ build/
 *.class
 
 **/src/main/resources/application.yml
+**/src/main/resources/application-prod.yml
 
 node_modules/
 dist/
