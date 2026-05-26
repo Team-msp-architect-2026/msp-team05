@@ -8,7 +8,6 @@ WORKDIR /app
 # 의존성 캐시 레이어 (소스 변경 시 재다운로드 방지)
 COPY build.gradle ./
 COPY gradle ./gradle
-RUN gradle dependencies --no-daemon || true
 
 # 소스 복사 후 빌드
 COPY src ./src
