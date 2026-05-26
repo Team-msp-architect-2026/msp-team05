@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main-branch ]
+    branches: [ feature/frontend-backend-integration ]
   workflow_dispatch:
 
 env:
