@@ -79,7 +79,8 @@
 
 ## 🏗️ 시스템 아키텍처
 
-<img width="850" height="850" alt="image" src="https://github.com/user-attachments/assets/aa08ce2c-db28-485e-a740-75bcdce2758b" />
+<img width="850" height="950" alt="image" src="https://github.com/user-attachments/assets/cab75c62-71e6-4213-a746-6dc888bd0cd9" />
+
 
 
 <!-- WAF 자동 대응 파이프라인 이미지 삽입 -->
