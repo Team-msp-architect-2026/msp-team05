@@ -97,7 +97,7 @@
 | **Backend** | Spring Boot 3.2.4 · JPA · Spring Security · JWT |
 | **Database** | RDS MySQL 8.0 · ElastiCache Redis 7.x |
 | **WAF / Security** | AWS WAF Bot Control Targeted · JA4 핑거프린팅 · CloudFront · Geo IP 차단 |
-| **Infra** | EC2 + Auto Scaling · ALB · S3 · Secrets Manager · Cognito |
+| **Infra** | EC2 + Auto Scaling · ALB · S3 · Secrets Manager · ACM · Route53 |
 | **IaC** | Terraform |
 | **분석** | Athena · CloudWatch |
 | **자동 대응** | CloudWatch → SNS → Lambda → WAF |
