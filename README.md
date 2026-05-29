@@ -79,7 +79,7 @@
 
 ## 🏗️ 시스템 아키텍처
 
-<img width="850" height="950" alt="image" src="https://github.com/user-attachments/assets/cab75c62-71e6-4213-a746-6dc888bd0cd9" />
+<img width="950" height="850" alt="image" src="https://github.com/user-attachments/assets/cab75c62-71e6-4213-a746-6dc888bd0cd9" />
 
 
 
