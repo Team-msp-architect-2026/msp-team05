@@ -8,6 +8,11 @@ output "alb_dns_name" {
   value       = aws_lb.app.dns_name
 }
 
+output "alb_hosted_zone_id" {
+  description = "ALB 호스팅 존 ID (Route53 ALIAS용)"
+  value       = aws_lb.app.zone_id
+}
+
 output "target_group_arn" {
   description = "Target Group ARN"
   value       = aws_lb_target_group.app.arn

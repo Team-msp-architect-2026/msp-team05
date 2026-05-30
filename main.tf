@@ -49,7 +49,7 @@ module "ec2" {
   alb_sg_id              = module.security.alb_sg_id
   ec2_sg_id              = module.security.ec2_sg_id
   ami_id                 = var.ami_id
-  certificate_arn        = var.certificate_arn
+  certificate_arn        = module.acm.alb_certificate_arn
 }
 
 module "rds" {
@@ -106,6 +106,34 @@ module "cloudfront" {
   alb_dns_name                = module.ec2.alb_dns_name
   waf_acl_arn                 = module.waf.waf_acl_arn
   waf_logs_bucket_id          = module.s3.waf_logs_bucket_id
+  certificate_arn             = module.acm.cloudfront_certificate_arn
+  domain_name                 = var.domain_name
+}
+
+# Route53 모듈
+module "route53" {
+  source = "./modules/route53"
+
+  project_name              = var.project_name
+  environment               = var.environment
+  domain_name               = var.domain_name
+  cloudfront_domain_name    = module.cloudfront.cloudfront_domain_name
+  cloudfront_hosted_zone_id = module.cloudfront.cloudfront_hosted_zone_id
+  alb_dns_name              = module.ec2.alb_dns_name
+  alb_hosted_zone_id        = module.ec2.alb_hosted_zone_id
+}
+
+# ACM 모듈
+module "acm" {
+  source = "./modules/acm"
+  providers = {
+    aws.us_east_1 = aws.us_east_1
+  }
+
+  project_name = var.project_name
+  environment  = var.environment
+  domain_name  = var.domain_name
+  zone_id      = module.route53.zone_id
 }
 
 # Athena 모듈
@@ -131,27 +159,27 @@ module "secrets" {
   jwt_secret     = var.jwt_secret
 }
 
-# Cognito 모듈
-module "cognito" {
-  source = "./modules/cognito"
+# Cognito 모듈 - 현재 미사용
+# module "cognito" {
+#   source = "./modules/cognito"
+#
+#   project_name = var.project_name
+#   environment  = var.environment
+# }
 
-  project_name = var.project_name
-  environment  = var.environment
-}
-
-# AWS Budgets - $50 알림
-resource "aws_budgets_budget" "main" {
-  name         = "${var.project_name}-${var.environment}-budget"
-  budget_type  = "COST"
-  limit_amount = "50"
-  limit_unit   = "USD"
-  time_unit    = "MONTHLY"
-
-  notification {
-    comparison_operator        = "GREATER_THAN"
-    threshold                  = 100
-    threshold_type             = "PERCENTAGE"
-    notification_type          = "ACTUAL"
-    subscriber_email_addresses = ["wnsvy0128@gmail.com"]
-  }
-}
+# AWS Budgets - 교육 계정 권한 없음으로 주석처리
+# resource "aws_budgets_budget" "main" {
+#   name         = "${var.project_name}-${var.environment}-budget"
+#   budget_type  = "COST"
+#   limit_amount = "50"
+#   limit_unit   = "USD"
+#   time_unit    = "MONTHLY"
+#
+#   notification {
+#     comparison_operator        = "GREATER_THAN"
+#     threshold                  = 100
+#     threshold_type             = "PERCENTAGE"
+#     notification_type          = "ACTUAL"
+#     subscriber_email_addresses = ["wnsvy0128@gmail.com"]
+#   }
+# }

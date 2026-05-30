@@ -47,3 +47,13 @@ variable "waf_logs_bucket_id" {
   description = "WAF 로그 S3 버킷 ID (CloudFront 접근 로그용)"
   type        = string
 }
+
+variable "certificate_arn" {
+  description = "ACM 인증서 ARN (CloudFront용 us-east-1)"
+  type        = string
+}
+
+variable "domain_name" {
+  description = "메인 도메인 이름"
+  type        = string
+}

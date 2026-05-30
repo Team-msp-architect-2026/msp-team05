@@ -110,7 +110,7 @@ resource "aws_route_table" "public" {
 
 # 퍼블릭 서브넷 라우트 테이블 연결
 resource "aws_route_table_association" "public" {
-  count          = length(aws_subnet.public)
+  count          = length(var.public_subnet_cidrs)
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
@@ -132,16 +132,16 @@ resource "aws_route_table" "private" {
   }
 }
 
-# 프라이빗 WAS 서브넷 라우트 테이블 연결 (각 AZ 전용 RT 사용)
+# 프라이빗 WAS 서브넷 라우트 테이블 연결
 resource "aws_route_table_association" "private_was" {
-  count          = length(aws_subnet.private_was)
+  count          = length(var.private_subnet_was_cidrs)
   subnet_id      = aws_subnet.private_was[count.index].id
   route_table_id = aws_route_table.private[count.index].id
 }
 
-# 프라이빗 DB 서브넷 라우트 테이블 연결 (각 AZ 전용 RT 사용)
+# 프라이빗 DB 서브넷 라우트 테이블 연결
 resource "aws_route_table_association" "private_db" {
-  count          = length(aws_subnet.private_db)
+  count          = length(var.private_subnet_db_cidrs)
   subnet_id      = aws_subnet.private_db[count.index].id
   route_table_id = aws_route_table.private[count.index].id
 }

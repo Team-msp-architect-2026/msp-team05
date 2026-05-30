@@ -38,6 +38,7 @@ resource "aws_cloudfront_distribution" "main" {
   is_ipv6_enabled     = true
   default_root_object = "index.html"
   web_acl_id          = var.waf_acl_arn
+  aliases             = [var.domain_name, "www.${var.domain_name}"]
 
   # 오리진 1 - S3 (프론트엔드)
   origin {
@@ -131,9 +132,11 @@ resource "aws_cloudfront_distribution" "main" {
     }
   }
 
-  # 기본 인증서 (도메인 없음)
+  # ACM 인증서 적용
   viewer_certificate {
-    cloudfront_default_certificate = true
+    acm_certificate_arn      = var.certificate_arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
 
   # SPA 라우팅 - 404 → index.html

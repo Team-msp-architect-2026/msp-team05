@@ -51,10 +51,10 @@ variable "ami_id" {
   type        = string
 }
 
-variable "certificate_arn" {
-  description = "ACM certificate ARN for HTTPS"
+variable "domain_name" {
+  description = "메인 도메인 이름"
   type        = string
-  default     = ""
+  default     = "kkybot.click"
 }
 
 variable "db_password" {

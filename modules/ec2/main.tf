@@ -111,30 +111,35 @@ resource "aws_lb_target_group" "app" {
   }
 }
 
-# ALB Listener HTTP → 임시로 forward (이슈 6번 ACM 완료 후 리다이렉트로 변경)
+# ALB Listener HTTP → HTTPS 리다이렉트
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.app.arn
   port              = 80
   protocol          = "HTTP"
 
   default_action {
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+# ALB Listener HTTPS
+resource "aws_lb_listener" "https" {
+  load_balancer_arn = aws_lb.app.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn   = var.certificate_arn
+
+  default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.app.arn
   }
 }
-
-# ALB Listener HTTPS - 이슈 6번 ACM 인증서 생성 후 활성화
-# resource "aws_lb_listener" "https" {
-#   load_balancer_arn = aws_lb.app.arn
-#   port              = 443
-#   protocol          = "HTTPS"
-#   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-#   certificate_arn   = var.certificate_arn
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.app.arn
-#   }
-# }
 
 # Auto Scaling Group
 resource "aws_autoscaling_group" "app" {
@@ -151,7 +156,7 @@ resource "aws_autoscaling_group" "app" {
 
   target_group_arns = [aws_lb_target_group.app.arn]
 
-  health_check_type         = "EC2"  # Spring Boot 배포 전 임시 (배포 후 ELB로 변경)
+  health_check_type         = "EC2"
   health_check_grace_period = 120
 
   tag {
