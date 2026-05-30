@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 public interface GameRepository extends JpaRepository<Game, String> {
 
@@ -24,4 +26,9 @@ public interface GameRepository extends JpaRepository<Game, String> {
             @Param("teamId") String teamId,
             @Param("stadiumId") String stadiumId,
             Pageable pageable);
+
+    List<Game> findByStatusAndStartTimeBefore(
+            Game.GameStatus status,
+            LocalDateTime startTime
+    );
 }

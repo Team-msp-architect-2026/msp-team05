@@ -87,4 +87,13 @@ public interface QueueTokenRepository
             "WHERE q.status IN ('ALLOWED', 'WAITING') " +
             "AND q.expiresAt < :now")
     List<QueueToken> findExpiredTokens(@Param("now") LocalDateTime now);
+
+    @Query("SELECT q FROM QueueToken q " +
+            "WHERE q.game.id = :gameId " +
+            "AND q.user.email = :email " +
+            "AND q.status != 'EXPIRED'")
+    Optional<QueueToken> findByGameIdAndUserEmail(
+            @Param("gameId") String gameId,
+            @Param("email") String email
+    );
 }

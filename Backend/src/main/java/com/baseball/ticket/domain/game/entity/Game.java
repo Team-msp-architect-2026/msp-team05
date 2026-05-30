@@ -52,4 +52,8 @@ public class Game {
     public enum GameStatus {
         SCHEDULED, ON_SALE, SOLD_OUT, FINISHED
     }
+
+    public void updateStatus(String status) {
+        this.status = GameStatus.valueOf(status);
+    }
 }

@@ -35,8 +35,13 @@ def get_game_id():
     )
     if res.status_code == 200:
         games = res.json()["data"]["content"]
-        if not games:
-            print("[경기 없음]")
+
+        on_sale = [
+            g for g in games
+            if g.get("status") == "ON_SALE"
+        ]
+        if not on_sale:
+            print("[경기 없음] ON_SALE 경기 없음")
             exit(1)
         print("\n[경기 목록]")
         for i, g in enumerate(games):

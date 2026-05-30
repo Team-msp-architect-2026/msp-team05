@@ -247,4 +247,12 @@ public class QueueService {
                 .orElseThrow(() -> new BusinessException("NOT_FOUND", 404));
         queueTokenRepository.delete(queueToken);
     }
+
+    public String getMyQueueToken(
+            String gameId, String email) {
+        return queueTokenRepository
+                .findByGameIdAndUserEmail(gameId, email)
+                .map(QueueToken::getToken)
+                .orElse(null);
+    }
 }

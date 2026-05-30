@@ -6,9 +6,6 @@ BASE_URL = "http://localhost:8080"
 EMAIL    = input("이메일 입력: ")
 PASSWD   = input("비밀번호 입력: ")
 
-# TLS Fingerprint 설정
-# chrome_120: Chrome 120 TLS Fingerprint
-# firefox_120: Firefox 120 TLS Fingerprint
 TLS_CLIENT = input(
     "TLS 클라이언트 선택\n"
     "1. chrome_120\n"
@@ -29,13 +26,11 @@ response_times = []
 token = None
 game_id = None
 
-# ── 1. tls-client 세션 생성 ────────────────
 session = tls_client.Session(
     client_identifier=client_id,
     random_tls_extension_order=True
 )
 
-# ── 2. 로그인 ──────────────────────────────
 def login():
     global token
     start = time.time()
@@ -54,7 +49,6 @@ def login():
         print(f"[로그인 실패] {res.status_code}: {res.text}")
         exit(1)
 
-# ── 3. 경기 목록 조회 ─────────────────────
 def get_game():
     global game_id
     res = session.get(
@@ -63,8 +57,12 @@ def get_game():
     )
     if res.status_code == 200:
         games = res.json()["data"]["content"]
-        if not games:
-            print("[경기 없음]")
+        on_sale = [
+            g for g in games
+            if g.get("status") == "ON_SALE"
+        ]
+        if not on_sale:
+            print("[경기 없음] ON_SALE 경기 없음")
             exit(1)
         print("\n[경기 목록]")
         for i, g in enumerate(games):
@@ -82,7 +80,6 @@ def get_game():
         print(f"[경기 조회 실패] {res.status_code}")
         exit(1)
 
-# ── 4. 대기열 진입 ────────────────────────
 def enter_queue():
     start = time.time()
     res = session.post(
@@ -102,7 +99,6 @@ def enter_queue():
         print(f"[대기열 실패] {res.status_code}: {res.text}")
         return None
 
-# ── 5. ALLOWED 대기 ───────────────────────
 def wait_for_allowed(queue_token):
     print("[대기열] ALLOWED 상태 대기 중...")
     for i in range(60):
@@ -124,9 +120,7 @@ def wait_for_allowed(queue_token):
     print("[대기열] 타임아웃")
     return False
 
-# ── 6. 좌석 조회 ──────────────────────────
 def get_seat():
-    # 1단계: 구역 목록 조회 (빠름)
     res = session.get(
         f"{BASE_URL}/api/games/{game_id}/seats",
         headers={"Authorization": f"Bearer {token}"},
@@ -158,7 +152,6 @@ def get_seat():
         print("[좌석] 선택 가능한 구역 없음")
         return None
 
-    # 2단계: 특정 구역 좌석만 조회
     print(f"[좌석] 구역별 조회: zoneId={target_zone_id}")
     res2 = session.get(
         f"{BASE_URL}/api/games/{game_id}/seats"
@@ -182,25 +175,20 @@ def get_seat():
     print("[좌석] 선택 가능한 좌석 없음")
     return None
 
-# ── 기존 대기열 정리 ──────────────────────
 def exit_existing_queue():
     res = session.get(
         f"{BASE_URL}/api/queue/my/{game_id}",
         headers={"Authorization": f"Bearer {token}"}
     )
     if res.status_code == 200:
-        data = res.json().get("data")
-        if data:
-            queue_token = data.get("queueToken")
-            if queue_token:
-                session.delete(
-                    f"{BASE_URL}/api/queue/exit/{queue_token}",
-                    headers={"Authorization": f"Bearer {token}"}
-                )
-                print("[대기열] 기존 대기열 나가기 완료")
+        queue_token = res.json().get("data")
+        if queue_token:
+                    session.delete(
+                        f"{BASE_URL}/api/queue/exit/{queue_token}",
+                        headers={"Authorization": f"Bearer {token}"}
+                    )
+                    print("[대기열] 기존 대기열 나가기 완료")
 
-
-# ── 7. 좌석 선점 ──────────────────────────
 def lock_seat(seat_id):
     start = time.time()
     res = session.post(
@@ -217,7 +205,6 @@ def lock_seat(seat_id):
         return lock_token
     return None
 
-# ── 8. 결제 ───────────────────────────────
 def pay(lock_token):
     # 결제 준비
     start = time.time()
@@ -268,12 +255,10 @@ def pay(lock_token):
     print(f"[예매 확정] 응답={reserve.status_code} 소요={elapsed:.3f}초")
     return reserve.status_code == 200
 
-# ── 9. 실행 ───────────────────────────────
 if __name__ == "__main__":
     login()
     get_game()
 
-    # 기존 대기열 정리 후 재진입
     exit_existing_queue()
 
     queue_token = enter_queue()

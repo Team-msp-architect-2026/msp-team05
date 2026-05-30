@@ -58,4 +58,19 @@ public class QueueController {
         queueService.exit(queueToken);
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
+
+    // GET /api/queue/my/{gameId}
+    @GetMapping("/my/{gameId}")
+    public ResponseEntity<ApiResponse<String>> getMyQueue(
+            @PathVariable String gameId,
+            @AuthenticationPrincipal String email) {
+
+        if (email == null) {
+            throw new BusinessException("UNAUTHORIZED", 401);
+        }
+
+        String queueToken =
+                queueService.getMyQueueToken(gameId, email);
+        return ResponseEntity.ok(ApiResponse.ok(queueToken));
+    }
 }
