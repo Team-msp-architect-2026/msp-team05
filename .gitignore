@@ -79,6 +79,7 @@ pnpm-debug.log*
 target/
 *.class
 *.jar
+!Backend/gradle/wrapper/gradle-wrapper.jar
 *.war
 .gradle/
 out/

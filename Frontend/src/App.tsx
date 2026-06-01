@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Navbar from './components/Navbar';
+//import Navbar from './components/Navbar';
 import MainPage from './pages/MainPage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
@@ -9,7 +9,7 @@ import SeatSelectPage from './pages/SeatSelectPage';
 import CheckoutPage from './pages/CheckoutPage';
 import ReservationPage from './pages/ReservationPage';
 import TicketPage from './pages/TicketPage';
-import NotFoundPage from './pages/NotFoundPage';
+//import NotFoundPage from './pages/NotFoundPage';
 import AdminPage from './pages/AdminPage';
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
