@@ -15,9 +15,10 @@ from playwright.async_api import async_playwright
 #from playwright_stealth import stealth_async
 from playwright_stealth import Stealth
 
-BASE_URL = "http://localhost:8080"
+BASE_URL     = "https://kkybot.click"
+#BASE_URL = "http://localhost:8080"
 FRONTEND_URL = "http://localhost:5173"
-LOG_FILE = "bot_v3_results.csv"
+LOG_FILE     = "bot_v3_results.csv"
 
 
 class PlaywrightTicketingBot:

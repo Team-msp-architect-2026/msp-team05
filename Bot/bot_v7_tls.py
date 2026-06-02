@@ -2,7 +2,8 @@ import tls_client
 import json
 import time
 
-BASE_URL = "http://localhost:8080"
+BASE_URL = "https://kkybot.click"
+#BASE_URL = "http://localhost:8080"
 EMAIL    = input("이메일 입력: ")
 PASSWD   = input("비밀번호 입력: ")
 

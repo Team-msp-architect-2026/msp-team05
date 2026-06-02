@@ -7,7 +7,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 
-BASE_URL = "http://localhost:5173"
+#BASE_URL = "http://localhost:5173"
+BASE_URL = "https://kkybot.click"
 EMAIL    = input("이메일 입력: ")
 PASSWD   = input("비밀번호 입력: ")
 HEADLESS = input("Headless 모드? (y/n): ").strip().lower() == "y"

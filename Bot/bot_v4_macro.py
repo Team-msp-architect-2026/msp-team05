@@ -10,7 +10,8 @@ import sys
 from headers import get_random_profile
 
 #BASE    = "http://localhost:8080"
-BASE_URL = "http://localhost:8080"
+#BASE_URL     = "http://localhost:8080"
+BASE_URL      = "https://kkybot.click"
 
 #BOT_EMAIL    = f"botv6_{int(time.time())}@test.com"
 #BOT_PASSWD   = "botv6pass1"

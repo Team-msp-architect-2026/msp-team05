@@ -11,7 +11,8 @@ import random
 import sys
 from headers import get_random_profile
 
-BASE        = "http://localhost:8080"
+BASE_URL    = "https://kkybot.click"
+#BASE        = "http://localhost:8080"
 TARGET_TEAM = None   # None = 첫 번째 ON_SALE 게임 / "LG" = LG 홈경기만 타겟
 
 # ── IP 풀 (랜덤 생성) ─────────────────────────────

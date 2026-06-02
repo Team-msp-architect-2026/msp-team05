@@ -10,7 +10,8 @@ import csv
 import os
 from datetime import datetime
 
-BASE_URL = "http://localhost:8080"
+BASE_URL = "https://kkybot.click"
+#BASE_URL = "http://localhost:8080"
 LOG_FILE = "bot_v1_results.csv"
 
 
