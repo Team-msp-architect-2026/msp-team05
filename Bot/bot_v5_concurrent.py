@@ -36,7 +36,7 @@ def make_headers(token=None):
 
 # ── GAME_ID 자동 감지 ─────────────────────────────
 async def fetch_game_id(session) -> str:
-    async with session.get(f"{BASE}/api/games", headers=make_headers()) as res:
+    async with session.get(f"{BASE_URL}/api/games", headers=make_headers()) as res:
         data = await res.json()
         games = data.get("data", {}).get("content", [])
         for game in games:
@@ -56,7 +56,7 @@ async def fetch_game_id(session) -> str:
 
 # ── 좌석 목록 조회 ────────────────────────────────
 async def fetch_seats(session, game_id: str):
-    async with session.get(f"{BASE}/api/games/{game_id}/seats",
+    async with session.get(f"{BASE_URL}/api/games/{game_id}/seats",
             headers=make_headers()) as res:
         data = await res.json()
         all_seats = []
@@ -75,14 +75,14 @@ async def bot_worker(session, worker_id, game_id, seats, results):
 
     try:
         # 1. 회원가입
-        async with session.post(f"{BASE}/api/auth/signup",
+        async with session.post(f"{BASE_URL}/api/auth/signup",
                 json={"email": email, "passwd": passwd,
                       "username": f"bot{worker_id}", "phonenum": "010-0000-0000"},
                 headers=make_headers()) as res:
             pass
 
         # 2. 로그인
-        async with session.post(f"{BASE}/api/auth/login",
+        async with session.post(f"{BASE_URL}/api/auth/login",
                 json={"email": email, "passwd": passwd},
                 headers=make_headers()) as res:
             data = await res.json()
@@ -99,7 +99,7 @@ async def bot_worker(session, worker_id, game_id, seats, results):
 
         lock_token = None
         amount     = 0
-        async with session.post(f"{BASE}/api/games/{game_id}/seats/lock",
+        async with session.post(f"{BASE_URL}/api/games/{game_id}/seats/lock",
                 json={"seatIds": [seat_id]},
                 headers=h) as res:
             status_code = res.status
@@ -117,7 +117,7 @@ async def bot_worker(session, worker_id, game_id, seats, results):
 
         # 4. 결제 준비 (LOCK 성공 시)
         if lock_token:
-            async with session.post(f"{BASE}/api/payments/prepare",
+            async with session.post(f"{BASE_URL}/api/payments/prepare",
                     json={"lockToken": lock_token, "paymentMethod": "CARD"},
                     headers=make_headers(token)) as res:
                 pay_code = res.status
