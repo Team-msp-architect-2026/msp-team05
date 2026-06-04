@@ -33,11 +33,6 @@ spring:
       ssl:
         enabled: false
 
-  security:
-    cors:
-      allowed-origins: https://kkybot.click,https://www.kkybot.click
-
-
 jwt:
   secret: ${JWT_SECRET}
   access-token-expiration: 3600000
