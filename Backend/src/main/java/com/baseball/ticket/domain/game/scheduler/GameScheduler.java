@@ -18,6 +18,39 @@ public class GameScheduler {
 
     private final GameRepository gameRepository;
 
+    @Scheduled(fixedDelay = 60000)
+    @Transactional
+    public void updateGameStatus() {
+        LocalDateTime now = LocalDateTime.now();
+
+        // SCHEDULED → ON_SALE
+        List<Game> scheduledGames = gameRepository
+                .findByStatusAndTicketOpenTimeBefore(
+                        Game.GameStatus.SCHEDULED,
+                        now
+                );
+
+        for (Game game : scheduledGames) {
+            game.updateStatus("ON_SALE");
+            log.info("경기 상태 ON_SALE 변경: gameId={}, ticketOpenTime={}",
+                    game.getId(), game.getTicketOpenTime());
+        }
+
+        // ON_SALE → FINISHED
+        List<Game> onSaleGames = gameRepository
+                .findByStatusAndStartTimeBefore(
+                        Game.GameStatus.ON_SALE,
+                        now
+                );
+
+        for (Game game : onSaleGames) {
+            game.updateStatus("FINISHED");
+            log.info("경기 상태 FINISHED 변경: gameId={}, startTime={}",
+                    game.getId(), game.getStartTime());
+        }
+    }
+
+    /*
     // 1분마다 경기 상태 확인
     @Scheduled(fixedDelay = 60000)
     @Transactional
@@ -34,4 +67,5 @@ public class GameScheduler {
                     game.getId(), game.getStartTime());
         }
     }
+     */
 }

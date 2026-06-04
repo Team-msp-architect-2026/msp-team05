@@ -31,4 +31,9 @@ public interface GameRepository extends JpaRepository<Game, String> {
             Game.GameStatus status,
             LocalDateTime startTime
     );
+
+    List<Game> findByStatusAndTicketOpenTimeBefore(
+            Game.GameStatus status,
+            LocalDateTime ticketOpenTime
+    );
 }
