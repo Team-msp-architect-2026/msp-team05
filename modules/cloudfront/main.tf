@@ -38,7 +38,7 @@ resource "aws_cloudfront_distribution" "main" {
   is_ipv6_enabled     = true
   default_root_object = "index.html"
   web_acl_id          = var.waf_acl_arn
-  aliases             = [var.domain_name, "www.${var.domain_name}"]
+  aliases               = [var.domain_name, "www.${var.domain_name}"]
 
   # 오리진 1 - S3 (프론트엔드)
   origin {
@@ -51,6 +51,11 @@ resource "aws_cloudfront_distribution" "main" {
   origin {
     domain_name = var.alb_dns_name
     origin_id   = "ALB-Backend"
+
+    custom_header {
+      name  = "X-CloudFront-Secret"
+      value = var.cloudfront_secret
+    }
 
     custom_origin_config {
       http_port              = 80
@@ -80,6 +85,7 @@ resource "aws_cloudfront_distribution" "main" {
     max_ttl     = 86400
   }
 
+/*
   # API 캐시 동작 - ALB 백엔드 (캐시 비활성화)
   ordered_cache_behavior {
     path_pattern           = "/api/*"
@@ -91,7 +97,7 @@ resource "aws_cloudfront_distribution" "main" {
 
     forwarded_values {
       query_string = true
-      headers      = ["Authorization", "Content-Type"]
+      headers      = ["Authorization", "Content-Type", "Origin"]
       cookies {
         forward = "all"
       }
@@ -101,6 +107,28 @@ resource "aws_cloudfront_distribution" "main" {
     default_ttl = 0
     max_ttl     = 0
   }
+*/
+  ordered_cache_behavior {
+    path_pattern           = "/api/*"
+    allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods         = ["GET", "HEAD"]
+    target_origin_id       = "ALB-Backend"
+    viewer_protocol_policy = "redirect-to-https"
+    compress               = true
+
+    forwarded_values {
+      query_string = true
+      headers      = ["*"]
+      cookies {
+        forward = "all"
+      }
+    }
+
+    min_ttl     = 0
+    default_ttl = 0
+    max_ttl     = 0
+  }
+
 
   # WebSocket 캐시 동작 - ALB 백엔드
   ordered_cache_behavior {
@@ -132,7 +160,6 @@ resource "aws_cloudfront_distribution" "main" {
     }
   }
 
-  # ACM 인증서 적용
   viewer_certificate {
     acm_certificate_arn      = var.certificate_arn
     ssl_support_method       = "sni-only"
@@ -144,13 +171,16 @@ resource "aws_cloudfront_distribution" "main" {
     error_code         = 404
     response_code      = 200
     response_page_path = "/index.html"
+    error_caching_min_ttl = 0
   }
 
+  # SPA 라우팅 - 403 → index.html
   custom_error_response {
-    error_code         = 403
-    response_code      = 200
-    response_page_path = "/index.html"
-  }
+    error_code            = 403
+    response_code         = 200
+    response_page_path    = "/index.html"
+    error_caching_min_ttl = 0
+}
 
   # CloudFront 접근 로그 S3 저장
   logging_config {

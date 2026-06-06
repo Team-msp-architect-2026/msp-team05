@@ -50,6 +50,30 @@ resource "aws_security_group" "redis" {
   }
 }
 
+/*
+# ALB 인바운드 - HTTP
+resource "aws_security_group_rule" "alb_ingress_http" {
+  type              = "ingress"
+  security_group_id = aws_security_group.alb.id
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  prefix_list_ids   = ["pl-93a247fa"]
+  description       = "CloudFront Only"
+}
+
+# ALB 인바운드 - HTTPS
+resource "aws_security_group_rule" "alb_ingress_https" {
+  type              = "ingress"
+  security_group_id = aws_security_group.alb.id
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  prefix_list_ids   = ["pl-93a247fa"]
+  description       = "CloudFront Only"
+}
+*/
+
 # ALB 인바운드 - HTTP
 resource "aws_security_group_rule" "alb_ingress_http" {
   type              = "ingress"

@@ -57,3 +57,9 @@ variable "domain_name" {
   description = "메인 도메인 이름"
   type        = string
 }
+
+variable "cloudfront_secret" {
+  description = "CloudFront → ALB 인증용 시크릿 헤더 값"
+  type        = string
+  sensitive   = true
+}
