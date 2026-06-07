@@ -27,3 +27,13 @@ output "ec2_iam_role_arn" {
   description = "EC2 IAM Role ARN"
   value       = aws_iam_role.ec2.arn
 }
+
+output "alb_arn_suffix" {
+  description = "ALB ARN Suffix (CloudWatch용)"
+  value       = aws_lb.app.arn_suffix
+}
+
+output "target_group_arn_suffix" {
+  description = "Target Group ARN Suffix (CloudWatch용)"
+  value       = aws_lb_target_group.app.arn_suffix
+}

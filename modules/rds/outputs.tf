@@ -27,3 +27,8 @@ output "rds_arn" {
   description = "RDS ARN"
   value       = aws_db_instance.main.arn
 }
+
+output "rds_instance_id" {
+  description = "RDS 인스턴스 ID (CloudWatch용)"
+  value       = aws_db_instance.main.identifier
+}
