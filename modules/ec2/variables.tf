@@ -59,7 +59,7 @@ variable "max_size" {
 variable "desired_capacity" {
   description = "Auto Scaling desired capacity"
   type        = number
-  default     = 2
+  default     = 1
 }
 
 variable "cpu_target_value" {
@@ -72,4 +72,10 @@ variable "certificate_arn" {
   description = "ACM certificate ARN for HTTPS"
   type        = string
   default     = ""
+}
+
+variable "cloudfront_secret" {
+  description = "CloudFront Secret Header 값"
+  type        = string
+  sensitive   = true
 }

@@ -40,6 +40,12 @@ resource "aws_iam_instance_profile" "ec2" {
   role = aws_iam_role.ec2.name
 }
 
+# ECR 접근 권한 추가
+resource "aws_iam_role_policy_attachment" "ecr" {
+  role       = aws_iam_role.ec2.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
 # Launch Template
 resource "aws_launch_template" "app" {
   name_prefix   = "${var.project_name}-${var.environment}-"
@@ -55,6 +61,12 @@ resource "aws_launch_template" "app" {
     security_groups             = [var.ec2_sg_id]
   }
 
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_put_response_hop_limit = 2
+    http_tokens                 = "required"
+  }
+
   user_data = base64encode(<<-EOF
     #!/bin/bash
     yum update -y
@@ -62,8 +74,29 @@ resource "aws_launch_template" "app" {
     systemctl start docker
     systemctl enable docker
     usermod -a -G docker ec2-user
-  EOF
-  )
+
+    # ECR 로그인
+    aws ecr get-login-password \
+      --region eu-west-2 | \
+      docker login \
+      --username AWS \
+      --password-stdin \
+      611058323802.dkr.ecr.eu-west-2.amazonaws.com
+
+    # 최신 이미지 pull
+    docker pull \
+      611058323802.dkr.ecr.eu-west-2.amazonaws.com/kky-prod-backend:latest
+
+    # 컨테이너 실행
+    docker run -d \
+      --name kky-backend \
+      --restart unless-stopped \
+      -p 8080:8080 \
+      -e SPRING_PROFILES_ACTIVE=prod \
+      -e TZ=Asia/Seoul \
+      611058323802.dkr.ecr.eu-west-2.amazonaws.com/kky-prod-backend:latest
+EOF
+)
 
   tags = {
     Name        = "${var.project_name}-${var.environment}-launch-template"
@@ -111,18 +144,35 @@ resource "aws_lb_target_group" "app" {
   }
 }
 
-# ALB Listener HTTP → HTTPS 리다이렉트
+# ALB Listener HTTP
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.app.arn
   port              = 80
   protocol          = "HTTP"
 
   default_action {
-    type = "redirect"
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Forbidden"
+      status_code  = "403"
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "cloudfront_http" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 1
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.app.arn
+  }
+
+  condition {
+    http_header {
+      http_header_name = "X-CloudFront-Secret"
+      values           = [var.cloudfront_secret]
     }
   }
 }
@@ -136,10 +186,32 @@ resource "aws_lb_listener" "https" {
   certificate_arn   = var.certificate_arn
 
   default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Forbidden"
+      status_code  = "403"
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "cloudfront_https" {
+  listener_arn = aws_lb_listener.https.arn
+  priority     = 1
+
+  action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.app.arn
   }
+
+  condition {
+    http_header {
+      http_header_name = "X-CloudFront-Secret"
+      values           = [var.cloudfront_secret]
+    }
+  }
 }
+
 
 # Auto Scaling Group
 resource "aws_autoscaling_group" "app" {
@@ -156,8 +228,8 @@ resource "aws_autoscaling_group" "app" {
 
   target_group_arns = [aws_lb_target_group.app.arn]
 
-  health_check_type         = "EC2"
-  health_check_grace_period = 120
+  health_check_type         = "ELB"  # Spring Boot 배포 전 임시 (배포 후 ELB로 변경)
+  health_check_grace_period = 600
 
   tag {
     key                 = "Name"

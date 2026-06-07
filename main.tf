@@ -50,6 +50,8 @@ module "ec2" {
   ec2_sg_id              = module.security.ec2_sg_id
   ami_id                 = var.ami_id
   certificate_arn        = module.acm.alb_certificate_arn
+  desired_capacity       = var.desired_capacity
+  cloudfront_secret      = var.cloudfront_secret
 }
 
 module "rds" {
@@ -108,6 +110,7 @@ module "cloudfront" {
   waf_logs_bucket_id          = module.s3.waf_logs_bucket_id
   certificate_arn             = module.acm.cloudfront_certificate_arn
   domain_name                 = var.domain_name
+  cloudfront_secret           = var.cloudfront_secret
 }
 
 # Route53 모듈
@@ -198,6 +201,13 @@ module "sns" {
   environment          = var.environment
   lambda_arn           = module.lambda.lambda_arn
   lambda_function_name = module.lambda.lambda_function_name
+}
+
+# ECR 모듈
+module "ecr" {
+  source       = "./modules/ecr"
+  project_name = var.project_name
+  environment  = var.environment
 }
 
 # Cognito 모듈 - 현재 미사용

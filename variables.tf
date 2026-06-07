@@ -31,13 +31,13 @@ variable "public_subnet_cidrs" {
 variable "private_subnet_was_cidrs" {
   description = "프라이빗 서브넷 WAS CIDR 목록"
   type        = list(string)
-  default     = ["10.0.11.0/24", "10.0.12.0/24"]
+  default     = ["10.0.10.0/24", "10.0.20.0/24"]
 }
 
 variable "private_subnet_db_cidrs" {
   description = "프라이빗 서브넷 DB CIDR 목록"
   type        = list(string)
-  default     = ["10.0.21.0/24", "10.0.22.0/24"]
+  default     = ["10.0.100.0/24", "10.0.200.0/24"]
 }
 
 variable "availability_zones" {
@@ -49,6 +49,18 @@ variable "availability_zones" {
 variable "ami_id" {
   description = "EC2 AMI ID"
   type        = string
+}
+
+variable "certificate_arn" {
+  description = "ACM certificate ARN for HTTPS"
+  type        = string
+  default     = ""
+}
+
+variable "desired_capacity" {
+  description = "Auto Scaling 원하는 용량"
+  type        = number
+  default     = 2
 }
 
 variable "domain_name" {
@@ -65,6 +77,12 @@ variable "db_password" {
 
 variable "jwt_secret" {
   description = "JWT Secret Key"
+  type        = string
+  sensitive   = true
+}
+
+variable "cloudfront_secret" {
+  description = "CloudFront → ALB 인증용 시크릿 헤더 값"
   type        = string
   sensitive   = true
 }
