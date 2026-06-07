@@ -178,7 +178,7 @@ public class QueueService {
         int estimatedWaitSeconds = pos * 5;
 
         String token = UUID.randomUUID().toString();
-        LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(10);
+        LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(30);
 
         queueTokenRepository.save(QueueToken.builder()
                 .user(user)
