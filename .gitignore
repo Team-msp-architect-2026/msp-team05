@@ -1,4 +1,7 @@
 *.tfstate
-*.tfstate.backup
+*.tfstate.*
 terraform.tfvars
 .terraform/
+modules/lambda/function.zip
+tfplan
+.idea/
