@@ -82,7 +82,7 @@ jobs:
                 "docker pull '"$ECR_REGISTRY/$ECR_REPOSITORY:latest"'",
                 "docker stop kky-backend || true",
                 "docker rm kky-backend || true",
-                "docker run -d --name kky-backend --restart unless-stopped -p 8080:8080 -e SPRING_PROFILES_ACTIVE=prod -e DB_HOST=${{ secrets.DB_HOST }} -e DB_NAME=${{ secrets.DB_NAME }} -e DB_USERNAME=${{ secrets.DB_USERNAME }} -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} -e REDIS_HOST=${{ secrets.REDIS_HOST }} -e JWT_SECRET=${{ secrets.JWT_SECRET }} '"$ECR_REGISTRY/$ECR_REPOSITORY:latest"'"
+                "docker run -d --name kky-backend --restart unless-stopped -p 8080:8080 -e SPRING_PROFILES_ACTIVE=prod -e TZ=Asia/Seoul -e DB_HOST=${{ secrets.DB_HOST }} -e DB_NAME=${{ secrets.DB_NAME }} -e DB_USERNAME=${{ secrets.DB_USERNAME }} -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} -e REDIS_HOST=${{ secrets.REDIS_HOST }} -e JWT_SECRET=${{ secrets.JWT_SECRET }} '"$ECR_REGISTRY/$ECR_REPOSITORY:latest"'"
               ]' \
               --region ${{ env.AWS_REGION }} \
               --query 'Command.CommandId' \
