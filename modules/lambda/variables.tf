@@ -22,3 +22,9 @@ variable "waf_acl_name" {
   description = "WAF Web ACL Name"
   type        = string
 }
+
+variable "slack_webhook_url" {
+  description = "Slack Incoming Webhook URL"
+  type        = string
+  sensitive   = true
+}

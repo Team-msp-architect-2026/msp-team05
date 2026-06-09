@@ -85,11 +85,12 @@ resource "aws_lambda_function" "waf_auto_response" {
 
   environment {
     variables = {
-      WAF_ACL_ID   = var.waf_acl_id
-      WAF_ACL_ARN  = var.waf_acl_arn
-      WAF_ACL_NAME = var.waf_acl_name
-      WAF_SCOPE    = "CLOUDFRONT"
-      WAF_REGION   = "us-east-1"
+      WAF_ACL_ID        = var.waf_acl_id
+      WAF_ACL_ARN       = var.waf_acl_arn
+      WAF_ACL_NAME      = var.waf_acl_name
+      WAF_SCOPE         = "CLOUDFRONT"
+      WAF_REGION        = "us-east-1"
+      SLACK_WEBHOOK_URL = var.slack_webhook_url
     }
   }
 

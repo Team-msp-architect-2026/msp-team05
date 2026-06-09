@@ -183,11 +183,12 @@ module "lambda" {
     aws.us_east_1 = aws.us_east_1
   }
 
-  project_name = var.project_name
-  environment  = var.environment
-  waf_acl_id   = module.waf.waf_acl_id
-  waf_acl_arn  = module.waf.waf_acl_arn
-  waf_acl_name = module.waf.waf_acl_name
+  project_name      = var.project_name
+  environment       = var.environment
+  waf_acl_id        = module.waf.waf_acl_id
+  waf_acl_arn       = module.waf.waf_acl_arn
+  waf_acl_name      = module.waf.waf_acl_name
+  slack_webhook_url = var.slack_webhook_url
 }
 
 # SNS 모듈
