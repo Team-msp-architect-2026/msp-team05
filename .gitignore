@@ -78,10 +78,14 @@ vendor/
 # ─────────────────────────────────────
 .terraform/
 *.tfstate
+*.tfstate.*
 *.tfstate.backup
 *.tfvars
 !*.tfvars.example
 .terraformrc
+terraform.tfvars
+modules/lambda/function.zip
+tfplan
 
 # ─────────────────────────────────────
 # Kubernetes / Helm

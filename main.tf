@@ -49,7 +49,6 @@ module "ec2" {
   alb_sg_id              = module.security.alb_sg_id
   ec2_sg_id              = module.security.ec2_sg_id
   ami_id                 = var.ami_id
-  #certificate_arn        = var.certificate_arn
   certificate_arn        = module.acm.alb_certificate_arn
   desired_capacity       = var.desired_capacity
   cloudfront_secret      = var.cloudfront_secret
@@ -94,6 +93,26 @@ module "waf" {
   waf_logs_bucket_arn = module.s3.waf_logs_bucket_arn
 }
 
+# CloudFront 모듈
+module "cloudfront" {
+  source = "./modules/cloudfront"
+  providers = {
+    aws.us_east_1 = aws.us_east_1
+  }
+
+  project_name                = var.project_name
+  environment                 = var.environment
+  frontend_bucket_id          = module.s3.frontend_bucket_id
+  frontend_bucket_arn         = module.s3.frontend_bucket_arn
+  frontend_bucket_domain_name = module.s3.frontend_bucket_domain_name
+  alb_dns_name                = module.ec2.alb_dns_name
+  waf_acl_arn                 = module.waf.waf_acl_arn
+  waf_logs_bucket_id          = module.s3.waf_logs_bucket_id
+  certificate_arn             = module.acm.cloudfront_certificate_arn
+  domain_name                 = var.domain_name
+  cloudfront_secret           = var.cloudfront_secret
+}
+
 # Route53 모듈
 module "route53" {
   source = "./modules/route53"
@@ -120,26 +139,6 @@ module "acm" {
   zone_id      = module.route53.zone_id
 }
 
-# CloudFront 모듈
-module "cloudfront" {
-  source = "./modules/cloudfront"
-  providers = {
-    aws.us_east_1 = aws.us_east_1
-  }
-
-  project_name                = var.project_name
-  environment                 = var.environment
-  frontend_bucket_id          = module.s3.frontend_bucket_id
-  frontend_bucket_arn         = module.s3.frontend_bucket_arn
-  frontend_bucket_domain_name = module.s3.frontend_bucket_domain_name
-  alb_dns_name                = module.ec2.alb_dns_name
-  waf_acl_arn                 = module.waf.waf_acl_arn
-  waf_logs_bucket_id          = module.s3.waf_logs_bucket_id
-  certificate_arn             = module.acm.cloudfront_certificate_arn
-  domain_name                 = var.domain_name
-  cloudfront_secret           = var.cloudfront_secret
-}
-
 # Athena 모듈
 module "athena" {
   source = "./modules/athena"
@@ -163,19 +162,55 @@ module "secrets" {
   jwt_secret     = var.jwt_secret
 }
 
-# Cognito 모듈
-#module "cognito" {
-#  source = "./modules/cognito"
+# CloudWatch 모듈
+module "cloudwatch" {
+  source = "./modules/cloudwatch"
 
-#  project_name = var.project_name
-#  environment  = var.environment
-#}
+  project_name            = var.project_name
+  environment             = var.environment
+  sns_topic_arn           = module.cloudwatch.sns_topic_arn
+  waf_web_acl_name        = module.waf.waf_acl_name
+  alb_arn_suffix          = module.ec2.alb_arn_suffix
+  target_group_arn_suffix = module.ec2.target_group_arn_suffix
+  asg_name                = module.ec2.autoscaling_group_name
+  rds_instance_id         = module.rds.rds_instance_id
+}
 
+# Lambda 모듈
+module "lambda" {
+  source = "./modules/lambda"
+  providers = {
+    aws.us_east_1 = aws.us_east_1
+  }
+
+  project_name      = var.project_name
+  environment       = var.environment
+  waf_acl_id        = module.waf.waf_acl_id
+  waf_acl_arn       = module.waf.waf_acl_arn
+  waf_acl_name      = module.waf.waf_acl_name
+  slack_webhook_url = var.slack_webhook_url
+}
+
+# SNS 모듈
+module "sns" {
+  source = "./modules/sns"
+  providers = {
+    aws.us_east_1 = aws.us_east_1
+  }
+
+  project_name         = var.project_name
+  environment          = var.environment
+  lambda_arn           = module.lambda.lambda_arn
+  lambda_function_name = module.lambda.lambda_function_name
+}
+
+# ECR 모듈
 module "ecr" {
   source       = "./modules/ecr"
   project_name = var.project_name
   environment  = var.environment
 }
+
 
 # CloudWatch 모듈
 module "cloudwatch" {
@@ -218,6 +253,7 @@ module "sns" {
   lambda_arn           = module.lambda.lambda_arn
   lambda_function_name = module.lambda.lambda_function_name
 }
+
 # AWS Budgets - $50 알림
 # resource "aws_budgets_budget" "main" {
 #  name         = "${var.project_name}-${var.environment}-budget"
@@ -233,4 +269,27 @@ module "sns" {
 #     notification_type          = "ACTUAL"
 #    subscriber_email_addresses = ["wnsvy0128@gmail.com"]
 #  }
+# Cognito 모듈 - 현재 미사용
+# module "cognito" {
+#   source = "./modules/cognito"
+#
+#   project_name = var.project_name
+#   environment  = var.environment
+# }
+
+# AWS Budgets - 교육 계정 권한 없음으로 주석처리
+# resource "aws_budgets_budget" "main" {
+#   name         = "${var.project_name}-${var.environment}-budget"
+#   budget_type  = "COST"
+#   limit_amount = "50"
+#   limit_unit   = "USD"
+#   time_unit    = "MONTHLY"
+#
+#   notification {
+#     comparison_operator        = "GREATER_THAN"
+#     threshold                  = 100
+#     threshold_type             = "PERCENTAGE"
+#     notification_type          = "ACTUAL"
+#     subscriber_email_addresses = ["wnsvy0128@gmail.com"]
+#   }
 # }

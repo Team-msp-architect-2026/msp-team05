@@ -54,6 +54,7 @@ resource "aws_iam_role_policy" "lambda_waf" {
           var.waf_acl_arn,
           "arn:aws:wafv2:us-east-1:611058323802:global/managedruleset/*/*"
         ]
+        Resource = var.waf_acl_arn
       },
       {
         Effect = "Allow"
@@ -93,6 +94,11 @@ resource "aws_lambda_function" "waf_auto_response" {
       WAF_ACL_NAME = var.waf_acl_name
       WAF_SCOPE    = "CLOUDFRONT"
       WAF_REGION   = "us-east-1"
+      WAF_ACL_ID        = var.waf_acl_id
+      WAF_ACL_ARN       = var.waf_acl_arn
+      WAF_ACL_NAME      = var.waf_acl_name
+      WAF_SCOPE         = "CLOUDFRONT"
+      WAF_REGION        = "us-east-1"
       SLACK_WEBHOOK_URL = var.slack_webhook_url
     }
   }
