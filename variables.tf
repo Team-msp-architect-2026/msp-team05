@@ -86,3 +86,9 @@ variable "cloudfront_secret" {
   type        = string
   sensitive   = true
 }
+
+variable "slack_webhook_url" {
+  description = "Slack Incoming Webhook URL"
+  type        = string
+  sensitive   = true
+}
