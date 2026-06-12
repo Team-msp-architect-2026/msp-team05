@@ -78,10 +78,14 @@ vendor/
 # ─────────────────────────────────────
 .terraform/
 *.tfstate
+*.tfstate.*
 *.tfstate.backup
 *.tfvars
 !*.tfvars.example
 .terraformrc
+terraform.tfvars
+modules/lambda/function.zip
+tfplan
 
 # ─────────────────────────────────────
 # Kubernetes / Helm
@@ -109,3 +113,9 @@ models/weights/
 tmp/
 *.bak
 *.tmp
+
+# ─────────────────────────────────────
+# Backend / Frontend 로컬 파일
+# ─────────────────────────────────────
+Backend/data/
+Frontend/.vite/
