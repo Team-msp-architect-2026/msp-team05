@@ -168,7 +168,7 @@ module "cloudwatch" {
 
   project_name            = var.project_name
   environment             = var.environment
-  sns_topic_arn           = module.cloudwatch.sns_topic_arn
+  sns_topic_arn           = module.sns.sns_topic_arn
   waf_web_acl_name        = module.waf.waf_acl_name
   alb_arn_suffix          = module.ec2.alb_arn_suffix
   target_group_arn_suffix = module.ec2.target_group_arn_suffix
@@ -211,64 +211,6 @@ module "ecr" {
   environment  = var.environment
 }
 
-
-# CloudWatch 모듈
-module "cloudwatch" {
-  source = "./modules/cloudwatch"
-
-  project_name            = var.project_name
-  environment             = var.environment
-  sns_topic_arn           = module.sns.sns_topic_arn
-  waf_web_acl_name        = module.waf.waf_acl_name
-  alb_arn_suffix          = module.ec2.alb_arn_suffix
-  target_group_arn_suffix = module.ec2.target_group_arn_suffix
-  asg_name                = module.ec2.autoscaling_group_name
-  rds_instance_id         = module.rds.rds_instance_id
-}
-
-# Lambda 모듈
-module "lambda" {
-  source = "./modules/lambda"
-  providers = {
-    aws.us_east_1 = aws.us_east_1
-  }
-
-  project_name = var.project_name
-  environment  = var.environment
-  waf_acl_id   = module.waf.waf_acl_id
-  waf_acl_arn  = module.waf.waf_acl_arn
-  waf_acl_name = module.waf.waf_acl_name
-  slack_webhook_url = var.slack_webhook_url
-}
-
-# SNS 모듈
-module "sns" {
-  source = "./modules/sns"
-  providers = {
-    aws.us_east_1 = aws.us_east_1
-  }
-
-  project_name         = var.project_name
-  environment          = var.environment
-  lambda_arn           = module.lambda.lambda_arn
-  lambda_function_name = module.lambda.lambda_function_name
-}
-
-# AWS Budgets - $50 알림
-# resource "aws_budgets_budget" "main" {
-#  name         = "${var.project_name}-${var.environment}-budget"
-#  budget_type  = "COST"
-#  limit_amount = "50"
-#  limit_unit   = "USD"
-#  time_unit    = "MONTHLY"
-
-#  notification {
-#    comparison_operator        = "GREATER_THAN"
-#    threshold                  = 100
-#    threshold_type             = "PERCENTAGE"
-#     notification_type          = "ACTUAL"
-#    subscriber_email_addresses = ["wnsvy0128@gmail.com"]
-#  }
 # Cognito 모듈 - 현재 미사용
 # module "cognito" {
 #   source = "./modules/cognito"
