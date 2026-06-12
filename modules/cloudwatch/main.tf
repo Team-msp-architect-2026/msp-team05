@@ -1,13 +1,3 @@
-# SNS Topic - 알람 발송용
-resource "aws_sns_topic" "alarm" {
-  name = "${var.project_name}-${var.environment}-alarm"
-
-  tags = {
-    Name        = "${var.project_name}-${var.environment}-alarm"
-    Project     = var.project_name
-    Environment = var.environment
-  }
-}
 
 # ─────────────────────────────────────────
 # WAF 알람
@@ -24,7 +14,7 @@ resource "aws_cloudwatch_metric_alarm" "waf_blocked" {
   threshold           = 100
   alarm_description   = "WAF 차단 요청 1분간 100건 초과"
   alarm_actions       = [var.sns_topic_arn]
-  alarm_actions       = [aws_sns_topic.alarm.arn]
+  ok_actions          = [var.sns_topic_arn]
 
   dimensions = {
     WebACL = var.waf_web_acl_name
@@ -53,7 +43,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_5xx" {
   threshold           = 10
   alarm_description   = "ALB 5XX 에러 1분간 10건 초과"
   alarm_actions       = [var.sns_topic_arn]
-  alarm_actions       = [aws_sns_topic.alarm.arn]
+  ok_actions          = [var.sns_topic_arn]
 
   dimensions = {
     LoadBalancer = var.alb_arn_suffix
@@ -76,7 +66,7 @@ resource "aws_cloudwatch_metric_alarm" "alb_response_time" {
   threshold           = 2
   alarm_description   = "ALB 평균 응답시간 2초 초과"
   alarm_actions       = [var.sns_topic_arn]
-  alarm_actions       = [aws_sns_topic.alarm.arn]
+  ok_actions          = [var.sns_topic_arn]
 
   dimensions = {
     LoadBalancer = var.alb_arn_suffix
@@ -103,7 +93,7 @@ resource "aws_cloudwatch_metric_alarm" "ec2_cpu" {
   threshold           = 70
   alarm_description   = "EC2 CPU 사용률 70% 초과"
   alarm_actions       = [var.sns_topic_arn]
-  alarm_actions       = [aws_sns_topic.alarm.arn]
+  ok_actions          = [var.sns_topic_arn]
 
   dimensions = {
     AutoScalingGroupName = var.asg_name
@@ -130,7 +120,7 @@ resource "aws_cloudwatch_metric_alarm" "asg_max_capacity" {
   threshold           = 3
   alarm_description   = "ASG 인스턴스 수 최대치 도달"
   alarm_actions       = [var.sns_topic_arn]
-  alarm_actions       = [aws_sns_topic.alarm.arn]
+  ok_actions          = [var.sns_topic_arn]
 
   dimensions = {
     AutoScalingGroupName = var.asg_name
@@ -157,7 +147,8 @@ resource "aws_cloudwatch_metric_alarm" "rds_connections" {
   threshold           = 80
   alarm_description   = "RDS 커넥션 수 80개 초과"
   alarm_actions       = [var.sns_topic_arn]
-  alarm_actions       = [aws_sns_topic.alarm.arn]
+  ok_actions          = [var.sns_topic_arn]
+
   dimensions = {
     DBInstanceIdentifier = var.rds_instance_id
   }
@@ -179,7 +170,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
   threshold           = 80
   alarm_description   = "RDS CPU 사용률 80% 초과"
   alarm_actions       = [var.sns_topic_arn]
-  alarm_actions       = [aws_sns_topic.alarm.arn]
+  ok_actions          = [var.sns_topic_arn]
 
   dimensions = {
     DBInstanceIdentifier = var.rds_instance_id
