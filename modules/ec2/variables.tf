@@ -75,7 +75,6 @@ variable "certificate_arn" {
 }
 
 variable "cloudfront_secret" {
-  description = "CloudFront → ALB 인증용 시크릿 헤더 값"
   description = "CloudFront Secret Header 값"
   type        = string
   sensitive   = true

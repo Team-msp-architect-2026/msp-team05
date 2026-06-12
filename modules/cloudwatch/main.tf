@@ -9,10 +9,6 @@ resource "aws_sns_topic" "alarm" {
   }
 }
 
-# ─────────────────────────────────────────
-# WAF 알람
-# ─────────────────────────────────────────
-
 resource "aws_cloudwatch_metric_alarm" "waf_blocked" {
   alarm_name          = "${var.project_name}-${var.environment}-waf-blocked"
   comparison_operator = "GreaterThanThreshold"
@@ -23,7 +19,6 @@ resource "aws_cloudwatch_metric_alarm" "waf_blocked" {
   statistic           = "Sum"
   threshold           = 100
   alarm_description   = "WAF 차단 요청 1분간 100건 초과"
-  alarm_actions       = [var.sns_topic_arn]
   alarm_actions       = [aws_sns_topic.alarm.arn]
 
   dimensions = {
@@ -38,10 +33,6 @@ resource "aws_cloudwatch_metric_alarm" "waf_blocked" {
   }
 }
 
-# ─────────────────────────────────────────
-# ALB 알람
-# ─────────────────────────────────────────
-
 resource "aws_cloudwatch_metric_alarm" "alb_5xx" {
   alarm_name          = "${var.project_name}-${var.environment}-alb-5xx"
   comparison_operator = "GreaterThanThreshold"
@@ -52,7 +43,6 @@ resource "aws_cloudwatch_metric_alarm" "alb_5xx" {
   statistic           = "Sum"
   threshold           = 10
   alarm_description   = "ALB 5XX 에러 1분간 10건 초과"
-  alarm_actions       = [var.sns_topic_arn]
   alarm_actions       = [aws_sns_topic.alarm.arn]
 
   dimensions = {
@@ -75,7 +65,6 @@ resource "aws_cloudwatch_metric_alarm" "alb_response_time" {
   statistic           = "Average"
   threshold           = 2
   alarm_description   = "ALB 평균 응답시간 2초 초과"
-  alarm_actions       = [var.sns_topic_arn]
   alarm_actions       = [aws_sns_topic.alarm.arn]
 
   dimensions = {
@@ -88,10 +77,6 @@ resource "aws_cloudwatch_metric_alarm" "alb_response_time" {
   }
 }
 
-# ─────────────────────────────────────────
-# EC2 알람
-# ─────────────────────────────────────────
-
 resource "aws_cloudwatch_metric_alarm" "ec2_cpu" {
   alarm_name          = "${var.project_name}-${var.environment}-ec2-cpu"
   comparison_operator = "GreaterThanThreshold"
@@ -102,7 +87,6 @@ resource "aws_cloudwatch_metric_alarm" "ec2_cpu" {
   statistic           = "Average"
   threshold           = 70
   alarm_description   = "EC2 CPU 사용률 70% 초과"
-  alarm_actions       = [var.sns_topic_arn]
   alarm_actions       = [aws_sns_topic.alarm.arn]
 
   dimensions = {
@@ -114,10 +98,6 @@ resource "aws_cloudwatch_metric_alarm" "ec2_cpu" {
     Environment = var.environment
   }
 }
-
-# ─────────────────────────────────────────
-# ASG 알람
-# ─────────────────────────────────────────
 
 resource "aws_cloudwatch_metric_alarm" "asg_max_capacity" {
   alarm_name          = "${var.project_name}-${var.environment}-asg-max-capacity"
@@ -129,7 +109,6 @@ resource "aws_cloudwatch_metric_alarm" "asg_max_capacity" {
   statistic           = "Average"
   threshold           = 3
   alarm_description   = "ASG 인스턴스 수 최대치 도달"
-  alarm_actions       = [var.sns_topic_arn]
   alarm_actions       = [aws_sns_topic.alarm.arn]
 
   dimensions = {
@@ -142,10 +121,6 @@ resource "aws_cloudwatch_metric_alarm" "asg_max_capacity" {
   }
 }
 
-# ─────────────────────────────────────────
-# RDS 알람
-# ─────────────────────────────────────────
-
 resource "aws_cloudwatch_metric_alarm" "rds_connections" {
   alarm_name          = "${var.project_name}-${var.environment}-rds-connections"
   comparison_operator = "GreaterThanThreshold"
@@ -156,8 +131,8 @@ resource "aws_cloudwatch_metric_alarm" "rds_connections" {
   statistic           = "Average"
   threshold           = 80
   alarm_description   = "RDS 커넥션 수 80개 초과"
-  alarm_actions       = [var.sns_topic_arn]
   alarm_actions       = [aws_sns_topic.alarm.arn]
+
   dimensions = {
     DBInstanceIdentifier = var.rds_instance_id
   }
@@ -178,7 +153,6 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
   statistic           = "Average"
   threshold           = 80
   alarm_description   = "RDS CPU 사용률 80% 초과"
-  alarm_actions       = [var.sns_topic_arn]
   alarm_actions       = [aws_sns_topic.alarm.arn]
 
   dimensions = {
@@ -190,10 +164,6 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
     Environment = var.environment
   }
 }
-
-# ─────────────────────────────────────────
-# CloudWatch 대시보드
-# ─────────────────────────────────────────
 
 resource "aws_cloudwatch_dashboard" "main" {
   dashboard_name = "${var.project_name}-${var.environment}-dashboard"
