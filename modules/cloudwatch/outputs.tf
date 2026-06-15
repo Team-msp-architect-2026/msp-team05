@@ -1,6 +1,6 @@
 output "sns_topic_arn" {
   description = "알람 발송용 SNS Topic ARN"
-  value       = aws_sns_topic.alarm.arn
+  value       = var.sns_topic_arn
 }
 
 output "dashboard_name" {
