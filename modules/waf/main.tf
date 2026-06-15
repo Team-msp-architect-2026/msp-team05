@@ -59,20 +59,20 @@ resource "aws_wafv2_web_acl" "main" {
         rule_action_override {
           name = "TGT_TokenReuseIp"
           action_to_use {
-            captcha {}
+            block {}
           }
         }
 
         rule_action_override {
           name = "TGT_VolumetricSession"
           action_to_use {
-            captcha {}
+            block {}
           }
         }
 
         scope_down_statement {
           byte_match_statement {
-            search_string         = "/api/queue"
+            search_string         = "/api/"
             positional_constraint = "STARTS_WITH"
             field_to_match {
               uri_path {}
