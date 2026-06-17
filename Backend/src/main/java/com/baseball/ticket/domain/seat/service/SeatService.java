@@ -121,6 +121,21 @@ public class SeatService {
                                       SeatLockRequest request,
                                       String userEmail) {
 
+/*
+        // ── CAPTCHA 검증 ──────────────────────────────
+        String captchaKey = "captcha:" + request.getCaptchaId();
+        String storedAnswer = redisTemplate.opsForValue().get(captchaKey);
+
+        if (storedAnswer == null) {
+            throw new BusinessException("CAPTCHA_EXPIRED", 400);
+        }
+        if (!storedAnswer.equalsIgnoreCase(request.getCaptchaAnswer())) {
+            throw new BusinessException("INVALID_CAPTCHA", 400);
+        }
+        // CAPTCHA 사용 후 삭제 (재사용 방지)
+        redisTemplate.delete(captchaKey);
+ */
+
         // 최대 4석 검증 (DTO @Size로도 하지만 서비스에서 한번 더)
         if (request.getSeatIds().size() > 4) {
             throw new BusinessException("EXCEED_MAX_SEATS", 400);

@@ -10,6 +10,8 @@ dist/
 dist-ssr/
 *.local
 
+Bot/*.png
+
 logs
 *.log
 npm-debug.log*
