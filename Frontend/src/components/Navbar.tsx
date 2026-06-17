@@ -4,18 +4,20 @@ import { useNavigate } from 'react-router-dom';
 export default function Navbar() {
   const navigate = useNavigate();
   const isLoggedIn = !!localStorage.getItem('accessToken');
+  const username = localStorage.getItem('username');
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
+    localStorage.removeItem('username');
     navigate('/login');
   };
 
   return (
     <header className="bg-blue-900 text-white shadow-lg">
       <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-        
+
         {/* 로고 */}
         <div
           className="flex items-center gap-2 cursor-pointer"
@@ -29,6 +31,11 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-4">
           {isLoggedIn ? (
             <>
+              {username && (
+                <span className="text-sm text-yellow-300 font-semibold">
+                  {username}님
+                </span>
+              )}
               <button
                 onClick={() => navigate('/reservations')}
                 className="text-sm hover:text-yellow-300 transition"
@@ -72,6 +79,11 @@ export default function Navbar() {
       {/* 모바일 드롭다운 메뉴 */}
       {menuOpen && (
         <div className="md:hidden bg-blue-800 px-4 py-3 flex flex-col gap-3">
+          {isLoggedIn && username && (
+            <span className="text-sm text-yellow-300 font-semibold py-2 border-b border-blue-700">
+              {username}님
+            </span>
+          )}
           <button
             onClick={() => { navigate('/reservations'); setMenuOpen(false); }}
             className="text-left text-sm hover:text-yellow-300 transition py-2 border-b border-blue-700"

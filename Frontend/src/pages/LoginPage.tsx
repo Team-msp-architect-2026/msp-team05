@@ -18,6 +18,12 @@ export default function LoginPage() {
       localStorage.setItem('accessToken', res.data.data.accessToken);
       localStorage.setItem('refreshToken', res.data.data.refreshToken);
 
+      // JWT 디코딩으로 username 추출
+      const token = res.data.data.accessToken;
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const email = payload.sub;
+      localStorage.setItem('username', email.split('@')[0]);
+
       const role = res.data.data.role;
       if (role === 'ADMIN') {
         navigate('/admin');
