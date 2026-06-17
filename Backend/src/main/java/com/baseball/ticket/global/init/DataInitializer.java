@@ -1,7 +1,9 @@
 package com.baseball.ticket.global.init;
 
+import com.baseball.ticket.domain.game.entity.Game;
 import com.baseball.ticket.domain.game.entity.Stadium;
 import com.baseball.ticket.domain.game.entity.Team;
+import com.baseball.ticket.domain.game.repository.GameRepository;
 import com.baseball.ticket.domain.game.repository.StadiumRepository;
 import com.baseball.ticket.domain.game.repository.TeamRepository;
 import com.baseball.ticket.domain.seat.entity.Seat;
@@ -15,6 +17,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -26,12 +29,13 @@ public class DataInitializer implements ApplicationRunner {
     private final StadiumRepository stadiumRepository;
     private final SeatZoneRepository seatZoneRepository;
     private final SeatRepository seatRepository;
+    private final GameRepository gameRepository;
 
     private record TeamDef(String name, String logoUrl) {}
     private record ZoneDef(String name, int price, int totalSeats) {}
     private record StadiumDef(String name, String address, List<ZoneDef> zones) {}
+    private record GameDef(String homeTeam, String awayTeam, String stadium, LocalDateTime startTime, LocalDateTime ticketOpenTime) {}
 
-    // KBO 10개 구단
     private static final List<TeamDef> TEAMS = List.of(
             new TeamDef("LG 트윈스",   ""),
             new TeamDef("두산 베어스",  ""),
@@ -45,7 +49,6 @@ public class DataInitializer implements ApplicationRunner {
             new TeamDef("NC 다이노스",  "")
     );
 
-    // 구장별 구역/좌석 수 (총 수용인원 기준 4구역 배분)
     private static final List<StadiumDef> STADIUMS = List.of(
             new StadiumDef("서울종합운동장 야구장", "서울특별시 송파구 올림픽로 25",
                     List.of(
@@ -119,10 +122,21 @@ public class DataInitializer implements ApplicationRunner {
                     ))
     );
 
+    private static final List<GameDef> GAMES = List.of(
+            new GameDef("LG 트윈스", "한화 이글스", "서울종합운동장 야구장",
+                    LocalDateTime.of(2026, 6, 20, 18, 30),
+                    LocalDateTime.of(2026, 6, 15, 10, 0)),
+            new GameDef("두산 베어스", "키움 히어로즈", "서울종합운동장 야구장",
+                    LocalDateTime.of(2026, 6, 21, 14, 0),
+                    LocalDateTime.of(2026, 6, 15, 10, 0)),
+            new GameDef("SSG 랜더스", "KT 위즈", "인천SSG랜더스필드",
+                    LocalDateTime.of(2026, 6, 22, 18, 30),
+                    LocalDateTime.of(2026, 6, 15, 10, 0))
+    );
+
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        // 팀 데이터 삽입
         for (TeamDef teamDef : TEAMS) {
             if (teamRepository.findByName(teamDef.name()).isPresent()) continue;
             teamRepository.save(Team.builder()
@@ -132,7 +146,6 @@ public class DataInitializer implements ApplicationRunner {
             log.info("팀 초기 데이터 생성 완료: {}", teamDef.name());
         }
 
-        // 구장/구역/좌석 데이터 삽입
         for (StadiumDef stadiumDef : STADIUMS) {
             if (stadiumRepository.findByName(stadiumDef.name()).isPresent()) continue;
 
@@ -167,6 +180,25 @@ public class DataInitializer implements ApplicationRunner {
                 }
             }
             log.info("구장 초기 데이터 생성 완료: {}", stadiumDef.name());
+        }
+
+        // 경기 데이터 삽입
+        if (gameRepository.count() == 0) {
+            for (GameDef gameDef : GAMES) {
+                Team homeTeam = teamRepository.findByName(gameDef.homeTeam()).orElse(null);
+                Team awayTeam = teamRepository.findByName(gameDef.awayTeam()).orElse(null);
+                Stadium stadium = stadiumRepository.findByName(gameDef.stadium()).orElse(null);
+                if (homeTeam == null || awayTeam == null || stadium == null) continue;
+                gameRepository.save(Game.builder()
+                        .homeTeam(homeTeam)
+                        .awayTeam(awayTeam)
+                        .stadium(stadium)
+                        .startTime(gameDef.startTime())
+                        .ticketOpenTime(gameDef.ticketOpenTime())
+                        .status(Game.GameStatus.ON_SALE)
+                        .build());
+                log.info("경기 초기 데이터 생성 완료: {} vs {}", gameDef.homeTeam(), gameDef.awayTeam());
+            }
         }
     }
 }
