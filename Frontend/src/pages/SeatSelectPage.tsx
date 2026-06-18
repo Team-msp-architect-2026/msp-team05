@@ -84,7 +84,7 @@ export default function SeatSelectPage() {
   const [captchaPassed, setCaptchaPassed] = useState(false);
   const [captchaError, setCaptchaError] = useState('');
   const [sdkReady, setSdkReady] = useState(false);
-  const captchaContainerRef = useRef<HTMLDivElement>(null);
+  const [captchaContainer, setCaptchaContainer] = useState<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (window.AwsWafCaptcha) {
@@ -105,8 +105,8 @@ export default function SeatSelectPage() {
   }, []);
 
   useEffect(() => {
-    if (sdkReady && !captchaPassed && captchaContainerRef.current && window.AwsWafCaptcha) {
-      window.AwsWafCaptcha.renderCaptcha(captchaContainerRef.current, {
+    if (sdkReady && !captchaPassed && captchaContainer && window.AwsWafCaptcha) {
+      window.AwsWafCaptcha.renderCaptcha(captchaContainer, {
         apiKey: WAF_CAPTCHA_API_KEY,
         onSuccess: () => {
           setCaptchaPassed(true);
@@ -118,7 +118,7 @@ export default function SeatSelectPage() {
         },
       });
     }
-  }, [sdkReady, captchaPassed]);
+  }, [sdkReady, captchaPassed, captchaContainer]);
 
   // 좌석 선택 페이지 진입 시 대기열 토큰 정리
   useEffect(() => {
@@ -268,7 +268,6 @@ export default function SeatSelectPage() {
     <div className="min-h-screen bg-gray-100">
       <Navbar />
 
-      {/* ── WAF CAPTCHA 모달 ─────────────────────── */}
       {!captchaPassed && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-lg p-6 w-96">
@@ -281,7 +280,7 @@ export default function SeatSelectPage() {
               <p className="text-center text-gray-400 text-sm py-8">보안 모듈을 불러오는 중...</p>
             )}
 
-            <div ref={captchaContainerRef} />
+            <div ref={setCaptchaContainer} />
 
             {captchaError && (
               <p className="text-red-500 text-xs mt-2 text-center">{captchaError}</p>
@@ -296,7 +295,6 @@ export default function SeatSelectPage() {
           </div>
         </div>
       )}
-      {/* ──────────────────────────────────────────── */}
 
       <div className="max-w-6xl mx-auto px-4 py-6">
         <div className="flex gap-4">
