@@ -66,6 +66,10 @@ declare global {
         onError?: (error: unknown) => void;
       }) => void;
     };
+    AwsWafIntegration?: {
+      fetch: (url: string, options?: RequestInit) => Promise<Response>;
+      getToken?: () => Promise<string>;
+    };
   }
 }
 
@@ -81,36 +85,67 @@ export default function SeatSelectPage() {
   const [loadingSeats, setLoadingSeats] = useState(false);
   const stompClient = useRef<Client | null>(null);
 
-  const [captchaPassed, setCaptchaPassed] = useState(false);
+  // WAF CAPTCHA 관련 state
+  // captchaModalOpen: WAF가 실제로 405(CAPTCHA 필요)를 응답했을 때만 true
+  const [captchaModalOpen, setCaptchaModalOpen] = useState(false);
   const [captchaError, setCaptchaError] = useState('');
-  const [sdkReady, setSdkReady] = useState(false);
   const [captchaContainer, setCaptchaContainer] = useState<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    if (window.AwsWafCaptcha) {
-      setSdkReady(true);
-      return;
-    }
-    const interval = setInterval(() => {
-      if (window.AwsWafCaptcha) {
-        setSdkReady(true);
-        clearInterval(interval);
+  // 1단계: 구역 목록 조회 (페이지 진입 시)
+  // AwsWafIntegration.fetch로 호출 → WAF가 405(CAPTCHA)를 주면
+  // 그 시점에 모달을 띄움. axios가 아니라 WAF JS SDK의 fetch 래퍼를 써야
+  // 405 응답을 정상적으로 인식하고 WAF 토큰을 자동 관리할 수 있음.
+  const fetchZones = async () => {
+    const accessToken = localStorage.getItem('accessToken');
+    try {
+      const result = await window.AwsWafIntegration!.fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/games/${gameId}/seats`,
+        {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${accessToken}` },
+        }
+      );
+
+      if (result.status === 405) {
+        // WAF가 CAPTCHA 액션으로 차단함
+        setCaptchaModalOpen(true);
+        setLoadingZones(false);
+        return;
       }
-    }, 100);
-    const timeout = setTimeout(() => clearInterval(interval), 10000);
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timeout);
-    };
-  }, []);
+
+      const data = await result.json();
+      const zoneList = data.data.zones;
+      const zoneInfoList: ZoneInfo[] = zoneList.map((zone: any) => ({
+        zoneId: zone.zoneId,
+        zoneName: zone.zoneName,
+        price: zone.price,
+        availableCount: zone.seats
+          ? zone.seats.filter((s: any) => s.status === 'AVAILABLE').length
+          : 0,
+        totalCount: zone.seats ? zone.seats.length : 0,
+      }));
+      setZones(zoneInfoList);
+    } catch (e) {
+      console.error('구역 조회 실패', e);
+    } finally {
+      setLoadingZones(false);
+    }
+  };
 
   useEffect(() => {
-    if (sdkReady && !captchaPassed && captchaContainer && window.AwsWafCaptcha) {
+    fetchZones();
+  }, [gameId]);
+
+  // WAF CAPTCHA 렌더링 — captchaModalOpen이 true가 되고
+  // 모달의 div가 실제로 DOM에 마운트(captchaContainer)되면 호출
+  useEffect(() => {
+    if (captchaModalOpen && captchaContainer && window.AwsWafCaptcha) {
       window.AwsWafCaptcha.renderCaptcha(captchaContainer, {
         apiKey: WAF_CAPTCHA_API_KEY,
         onSuccess: () => {
-          setCaptchaPassed(true);
+          setCaptchaModalOpen(false);
           setCaptchaError('');
+          fetchZones(); // 캡챠 통과 후 원래 요청 재시도
         },
         onError: (error) => {
           console.error('WAF CAPTCHA 에러', error);
@@ -118,7 +153,7 @@ export default function SeatSelectPage() {
         },
       });
     }
-  }, [sdkReady, captchaPassed, captchaContainer]);
+  }, [captchaModalOpen, captchaContainer]);
 
   // 좌석 선택 페이지 진입 시 대기열 토큰 정리
   useEffect(() => {
@@ -129,26 +164,6 @@ export default function SeatSelectPage() {
         .finally(() => localStorage.removeItem('queueToken'));
     }
   }, []);
-
-  // 1단계: 구역 목록만 조회 (페이지 진입 시)
-  useEffect(() => {
-    api.get(`/api/games/${gameId}/seats`)
-      .then(res => {
-        const zoneList = res.data.data.zones;
-        const zoneInfoList: ZoneInfo[] = zoneList.map((zone: any) => ({
-          zoneId: zone.zoneId,
-          zoneName: zone.zoneName,
-          price: zone.price,
-          availableCount: zone.seats
-            ? zone.seats.filter((s: any) => s.status === 'AVAILABLE').length
-            : 0,
-          totalCount: zone.seats ? zone.seats.length : 0,
-        }));
-        setZones(zoneInfoList);
-      })
-      .catch(e => console.error('구역 조회 실패', e))
-      .finally(() => setLoadingZones(false));
-  }, [gameId]);
 
   // 2단계: 구역 선택 시 해당 구역 좌석만 조회
   useEffect(() => {
@@ -268,17 +283,13 @@ export default function SeatSelectPage() {
     <div className="min-h-screen bg-gray-100">
       <Navbar />
 
-      {!captchaPassed && (
+      {captchaModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-lg p-6 w-96">
             <h2 className="text-center font-bold text-lg mb-1">클린예매 서비스</h2>
             <p className="text-center text-sm text-gray-500 mb-4">
               부정예매를 방지하기 위해 <span className="text-blue-600 font-bold">보안 인증</span> 후 예매가 가능합니다.
             </p>
-
-            {!sdkReady && (
-              <p className="text-center text-gray-400 text-sm py-8">보안 모듈을 불러오는 중...</p>
-            )}
 
             <div ref={setCaptchaContainer} />
 
