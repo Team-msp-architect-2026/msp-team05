@@ -97,6 +97,7 @@ export default function SeatSelectPage() {
   // 405 응답을 정상적으로 인식하고 WAF 토큰을 자동 관리할 수 있음.
   const fetchZones = async () => {
     const accessToken = localStorage.getItem('accessToken');
+    setLoadingZones(true);
     try {
       const result = await window.AwsWafIntegration!.fetch(
         `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/games/${gameId}/seats`,
