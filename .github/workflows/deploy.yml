@@ -60,28 +60,6 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Build Frontend
-        working-directory: ./Frontend
-        env:
-          VITE_API_URL: https://kkybot.click
-        run: |
-          npm install
-          npm run build
-
-      - name: Deploy Frontend to S3
-        run: |
-          aws s3 sync Frontend/dist/ s3://kky-prod-frontend --delete
-
-      - name: Invalidate CloudFront
-        run: |
-          CF_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Aliases.Items[0]=='kkybot.click'].Id" --output text)
-          aws cloudfront create-invalidation --distribution-id $CF_ID --paths "/*"
-
       - name: Deploy to EC2 via SSM
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -131,3 +109,8 @@ jobs:
             done
           done
           echo "전체 배포 완료"
+
+#          aws ssm wait command-executed \
+#            --command-id $COMMAND_ID \
+#            --instance-id ${{ steps.get-instance.outputs.instance_id }} \
+#            --region ${{ env.AWS_REGION }}
