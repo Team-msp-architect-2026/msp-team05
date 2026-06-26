@@ -1,6 +1,39 @@
-# ─────────────────────────────────────
-# OS / IDE
-# ─────────────────────────────────────
+build/
+.gradle/
+*.class
+
+**/src/main/resources/application.yml
+**/src/main/resources/application-prod.yml
+
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+Bot/*.png
+
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+.env
+.env.production
+.env.local
+
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
 .DS_Store
 Thumbs.db
 .vscode/
@@ -8,9 +41,6 @@ Thumbs.db
 *.swp
 *~
 
-# ─────────────────────────────────────
-# 🔒 Secrets (절대 커밋 금지)
-# ─────────────────────────────────────
 .env
 .env.*
 !.env.example
@@ -26,9 +56,6 @@ kubeconfig.*
 **/credentials*
 *-sealed.yaml.bak
 
-# ─────────────────────────────────────
-# Python
-# ─────────────────────────────────────
 __pycache__/
 *.py[cod]
 *.egg-info/
@@ -40,9 +67,6 @@ venv/
 htmlcov/
 .coverage
 
-# ─────────────────────────────────────
-# Node / JavaScript
-# ─────────────────────────────────────
 node_modules/
 dist/
 build/
@@ -54,28 +78,20 @@ npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
 
-# ─────────────────────────────────────
-# Java / JVM
-# ─────────────────────────────────────
 target/
 *.class
 *.jar
+!Backend/gradle/wrapper/gradle-wrapper.jar
 *.war
 .gradle/
 out/
 .mvn/wrapper/maven-wrapper.jar
 
-# ─────────────────────────────────────
-# Go
-# ─────────────────────────────────────
 *.exe
 *.test
 *.out
 vendor/
 
-# ─────────────────────────────────────
-# Terraform / IaC
-# ─────────────────────────────────────
 .terraform/
 *.tfstate
 *.tfstate.backup
@@ -83,16 +99,10 @@ vendor/
 !*.tfvars.example
 .terraformrc
 
-# ─────────────────────────────────────
-# Kubernetes / Helm
-# ─────────────────────────────────────
 charts/*.tgz
 values.local.yaml
 **/*.local.yaml
 
-# ─────────────────────────────────────
-# Data / Model (대용량 — Git LFS 사용)
-# ─────────────────────────────────────
 *.csv
 *.parquet
 *.h5
@@ -103,9 +113,6 @@ values.local.yaml
 data/raw/
 models/weights/
 
-# ─────────────────────────────────────
-# Misc
-# ─────────────────────────────────────
 tmp/
 *.bak
 *.tmp
