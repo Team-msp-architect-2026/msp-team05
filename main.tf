@@ -52,6 +52,8 @@ module "ec2" {
   certificate_arn        = module.acm.alb_certificate_arn
   desired_capacity       = var.desired_capacity
   cloudfront_secret      = var.cloudfront_secret
+  account_id             = "381492097392"
+  aws_region             = var.aws_region
 }
 
 module "rds" {
@@ -147,6 +149,7 @@ module "athena" {
   environment         = var.environment
   waf_logs_bucket_id  = module.s3.waf_logs_bucket_id
   waf_logs_bucket_arn = module.s3.waf_logs_bucket_arn
+  account_id          = "381492097392"
 }
 
 # Secrets Manager 모듈

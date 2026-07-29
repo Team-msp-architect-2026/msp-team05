@@ -17,3 +17,8 @@ variable "waf_logs_bucket_arn" {
   description = "WAF 로그 S3 버킷 ARN"
   type        = string
 }
+
+variable "account_id" {
+  description = "AWS account ID"
+  type        = string
+}

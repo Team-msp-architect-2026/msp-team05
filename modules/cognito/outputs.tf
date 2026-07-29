@@ -15,5 +15,5 @@ output "app_client_id" {
 
 output "cognito_endpoint" {
   description = "Cognito 엔드포인트"
-  value       = "https://cognito-idp.${var.environment == "prod" ? "eu-west-2" : "eu-west-2"}.amazonaws.com/${aws_cognito_user_pool.main.id}"
+  value       = "https://cognito-idp.${var.aws_region}.amazonaws.com/${aws_cognito_user_pool.main.id}"
 }

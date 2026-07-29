@@ -29,7 +29,7 @@ resource "aws_acm_certificate" "cloudfront" {
   }
 }
 
-# ALB용 ACM 인증서 (eu-west-2)
+# ALB용 ACM 인증서 (ap-northeast-2)
 resource "aws_acm_certificate" "alb" {
   domain_name       = "api.${var.domain_name}"
   validation_method = "DNS"

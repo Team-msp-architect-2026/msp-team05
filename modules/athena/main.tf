@@ -68,7 +68,7 @@ resource "aws_athena_named_query" "create_waf_table" {
     WITH SERDEPROPERTIES ('ignore.malformed.json' = 'true')
     STORED AS INPUTFORMAT 'org.apache.hadoop.mapred.TextInputFormat'
     OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
-    LOCATION 's3://${var.waf_logs_bucket_id}/AWSLogs/611058323802/WAFLogs/cloudfront/kky-prod-waf/'
+    LOCATION 's3://${var.waf_logs_bucket_id}/AWSLogs/${var.account_id}/WAFLogs/cloudfront/kky-prod-waf/'
     TBLPROPERTIES ('has_encrypted_data'='false');
   EOT
 }
