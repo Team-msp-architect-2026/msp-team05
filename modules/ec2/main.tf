@@ -70,22 +70,34 @@ resource "aws_launch_template" "app" {
   user_data = base64encode(<<-EOF
     #!/bin/bash
     yum update -y
-    yum install -y docker
+    yum install -y docker jq
     systemctl start docker
     systemctl enable docker
     usermod -a -G docker ec2-user
 
     # ECR 로그인
     aws ecr get-login-password \
-      --region eu-west-2 | \
+      --region ${var.aws_region} | \
       docker login \
       --username AWS \
       --password-stdin \
-      611058323802.dkr.ecr.eu-west-2.amazonaws.com
+      ${var.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com
 
     # 최신 이미지 pull
     docker pull \
-      611058323802.dkr.ecr.eu-west-2.amazonaws.com/kky-prod-backend:latest
+      ${var.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/kky-prod-backend:latest
+
+    # Secrets Manager에서 DB/Redis/JWT 접속 정보 조회
+    DB_SECRET=$(aws secretsmanager get-secret-value --region ${var.aws_region} --secret-id ${var.project_name}-${var.environment}-db-secret --query SecretString --output text)
+    REDIS_SECRET=$(aws secretsmanager get-secret-value --region ${var.aws_region} --secret-id ${var.project_name}-${var.environment}-redis-secret --query SecretString --output text)
+    JWT_SECRET_JSON=$(aws secretsmanager get-secret-value --region ${var.aws_region} --secret-id ${var.project_name}-${var.environment}-jwt-secret --query SecretString --output text)
+
+    DB_HOST=$(echo "$DB_SECRET" | jq -r .host)
+    DB_NAME=$(echo "$DB_SECRET" | jq -r .dbname)
+    DB_USERNAME=$(echo "$DB_SECRET" | jq -r .username)
+    DB_PASSWORD=$(echo "$DB_SECRET" | jq -r .password)
+    REDIS_HOST=$(echo "$REDIS_SECRET" | jq -r .host)
+    JWT_SECRET=$(echo "$JWT_SECRET_JSON" | jq -r .secret)
 
     # 컨테이너 실행
     docker run -d \
@@ -94,7 +106,13 @@ resource "aws_launch_template" "app" {
       -p 8080:8080 \
       -e SPRING_PROFILES_ACTIVE=prod \
       -e TZ=Asia/Seoul \
-      611058323802.dkr.ecr.eu-west-2.amazonaws.com/kky-prod-backend:latest
+      -e DB_HOST="$DB_HOST" \
+      -e DB_NAME="$DB_NAME" \
+      -e DB_USERNAME="$DB_USERNAME" \
+      -e DB_PASSWORD="$DB_PASSWORD" \
+      -e REDIS_HOST="$REDIS_HOST" \
+      -e JWT_SECRET="$JWT_SECRET" \
+      ${var.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/kky-prod-backend:latest
 EOF
 )
 

@@ -3,7 +3,7 @@
 variable "aws_region" {
   description = "AWS 리전"
   type        = string
-  default     = "eu-west-2"
+  default     = "ap-northeast-2"
 }
 
 variable "project_name" {
@@ -45,5 +45,5 @@ variable "private_subnet_db_cidrs" {
 variable "availability_zones" {
   description = "가용 영역 목록"
   type        = list(string)
-  default     = ["eu-west-2a", "eu-west-2c"]
+  default     = ["ap-northeast-2a", "ap-northeast-2c"]
 }

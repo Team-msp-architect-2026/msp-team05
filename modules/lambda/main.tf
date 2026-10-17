@@ -45,6 +45,9 @@ resource "aws_iam_role_policy" "lambda_waf" {
     Version = "2012-10-17"
     Statement = [
       {
+        # UpdateWebACL 호출 시 WebACL 자체 리소스뿐 아니라, WebACL이 참조하는
+        # AWS Managed Rule Group(AWSManagedRulesBotControlRuleSet)에 대한 접근 권한도
+        # 같은 계정 하위 managedruleset 리소스로 함께 검사되므로 둘 다 허용해야 함
         Effect = "Allow"
         Action = [
           "wafv2:GetWebACL",
@@ -52,9 +55,8 @@ resource "aws_iam_role_policy" "lambda_waf" {
         ]
         Resource = [
           var.waf_acl_arn,
-          "arn:aws:wafv2:us-east-1:611058323802:global/managedruleset/*/*"
+          "arn:aws:wafv2:us-east-1:${var.account_id}:global/managedruleset/*/*"
         ]
-        Resource = var.waf_acl_arn
       },
       {
         Effect = "Allow"

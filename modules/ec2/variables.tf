@@ -47,7 +47,7 @@ variable "ami_id" {
 variable "min_size" {
   description = "Auto Scaling minimum size"
   type        = number
-  default     = 1
+  default     = 2
 }
 
 variable "max_size" {
@@ -78,4 +78,15 @@ variable "cloudfront_secret" {
   description = "CloudFront Secret Header 값"
   type        = string
   sensitive   = true
+}
+
+variable "aws_region" {
+  description = "AWS 리전"
+  type        = string
+  default     = "ap-northeast-2"
+}
+
+variable "account_id" {
+  description = "AWS 계정 ID"
+  type        = string
 }

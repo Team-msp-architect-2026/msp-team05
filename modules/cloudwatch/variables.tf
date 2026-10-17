@@ -1,3 +1,13 @@
+terraform {
+  required_providers {
+    aws = {
+      source                = "hashicorp/aws"
+      version               = "~> 5.0"
+      configuration_aliases = [aws.us_east_1]
+    }
+  }
+}
+
 variable "project_name" {
   description = "프로젝트 이름"
   type        = string
@@ -10,6 +20,11 @@ variable "environment" {
 
 variable "sns_topic_arn" {
   description = "알람 발송용 SNS Topic ARN"
+  type        = string
+}
+
+variable "sns_topic_arn_us_east_1" {
+  description = "알람 발송용 SNS Topic ARN (us-east-1, CloudFront WAF 알람 전용)"
   type        = string
 }
 

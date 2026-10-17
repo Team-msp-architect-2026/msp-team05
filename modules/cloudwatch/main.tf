@@ -1,4 +1,5 @@
 resource "aws_cloudwatch_metric_alarm" "waf_blocked" {
+  provider            = aws.us_east_1
   alarm_name          = "${var.project_name}-${var.environment}-waf-blocked"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
@@ -8,12 +9,11 @@ resource "aws_cloudwatch_metric_alarm" "waf_blocked" {
   statistic           = "Sum"
   threshold           = 100
   alarm_description   = "WAF 차단 요청 1분간 100건 초과"
-  alarm_actions       = [var.sns_topic_arn]
-  ok_actions          = [var.sns_topic_arn]
+  alarm_actions       = [var.sns_topic_arn_us_east_1]
+  ok_actions          = [var.sns_topic_arn_us_east_1]
 
   dimensions = {
     WebACL = var.waf_web_acl_name
-    Region = "us-east-1"
     Rule   = "ALL"
   }
 
@@ -175,7 +175,7 @@ resource "aws_cloudwatch_dashboard" "main" {
         properties = {
           title   = "WAF 차단 요청"
           region  = "us-east-1"
-          metrics = [["AWS/WAFV2", "BlockedRequests", "WebACL", var.waf_web_acl_name, "Region", "us-east-1", "Rule", "ALL"]]
+          metrics = [["AWS/WAFV2", "BlockedRequests", "WebACL", var.waf_web_acl_name, "Rule", "ALL"]]
           period  = 60
           stat    = "Sum"
           view    = "timeSeries"
@@ -189,7 +189,7 @@ resource "aws_cloudwatch_dashboard" "main" {
         height = 6
         properties = {
           title   = "ALB 5XX 에러"
-          region  = "eu-west-2"
+          region  = "ap-northeast-2"
           metrics = [["AWS/ApplicationELB", "HTTPCode_ELB_5XX_Count", "LoadBalancer", var.alb_arn_suffix]]
           period  = 60
           stat    = "Sum"
@@ -204,7 +204,7 @@ resource "aws_cloudwatch_dashboard" "main" {
         height = 6
         properties = {
           title   = "EC2 CPU 사용률"
-          region  = "eu-west-2"
+          region  = "ap-northeast-2"
           metrics = [["AWS/EC2", "CPUUtilization", "AutoScalingGroupName", var.asg_name]]
           period  = 60
           stat    = "Average"
@@ -219,7 +219,7 @@ resource "aws_cloudwatch_dashboard" "main" {
         height = 6
         properties = {
           title   = "ASG 인스턴스 수"
-          region  = "eu-west-2"
+          region  = "ap-northeast-2"
           metrics = [["AWS/AutoScaling", "GroupInServiceInstances", "AutoScalingGroupName", var.asg_name]]
           period  = 60
           stat    = "Average"
@@ -234,7 +234,7 @@ resource "aws_cloudwatch_dashboard" "main" {
         height = 6
         properties = {
           title   = "RDS 커넥션 수"
-          region  = "eu-west-2"
+          region  = "ap-northeast-2"
           metrics = [["AWS/RDS", "DatabaseConnections", "DBInstanceIdentifier", var.rds_instance_id]]
           period  = 60
           stat    = "Average"
@@ -249,7 +249,7 @@ resource "aws_cloudwatch_dashboard" "main" {
         height = 6
         properties = {
           title   = "ALB 응답시간"
-          region  = "eu-west-2"
+          region  = "ap-northeast-2"
           metrics = [["AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", var.alb_arn_suffix]]
           period  = 60
           stat    = "Average"

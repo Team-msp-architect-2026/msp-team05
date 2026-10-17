@@ -168,10 +168,14 @@ module "secrets" {
 # CloudWatch 모듈
 module "cloudwatch" {
   source = "./modules/cloudwatch"
+  providers = {
+    aws.us_east_1 = aws.us_east_1
+  }
 
   project_name            = var.project_name
   environment             = var.environment
   sns_topic_arn           = module.sns.sns_topic_arn
+  sns_topic_arn_us_east_1 = module.sns.sns_topic_arn_us_east_1
   waf_web_acl_name        = module.waf.waf_acl_name
   alb_arn_suffix          = module.ec2.alb_arn_suffix
   target_group_arn_suffix = module.ec2.target_group_arn_suffix
@@ -192,6 +196,7 @@ module "lambda" {
   waf_acl_arn       = module.waf.waf_acl_arn
   waf_acl_name      = module.waf.waf_acl_name
   slack_webhook_url = var.slack_webhook_url
+  account_id        = "381492097392"
 }
 
 # SNS 모듈

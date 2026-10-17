@@ -55,3 +55,52 @@ resource "aws_lambda_permission" "sns_invoke" {
   principal     = "sns.amazonaws.com"
   source_arn    = aws_sns_topic.waf_alarm.arn
 }
+
+# WAF 알람 수신용 SNS 토픽 (us-east-1) - CloudFront WAF 지표는 us-east-1에서만
+# 알람이 생성 가능하고, CloudWatch alarm_actions는 같은 리전의 SNS 토픽만 허용하므로 별도 생성
+resource "aws_sns_topic" "waf_alarm_us_east_1" {
+  provider = aws.us_east_1
+  name     = "${var.project_name}-${var.environment}-waf-alarm-use1"
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}-waf-alarm-use1"
+    Project     = var.project_name
+    Environment = var.environment
+  }
+}
+
+resource "aws_sns_topic_policy" "cloudwatch_publish_us_east_1" {
+  provider = aws.us_east_1
+  arn      = aws_sns_topic.waf_alarm_us_east_1.arn
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowCloudWatchPublish"
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudwatch.amazonaws.com"
+        }
+        Action   = "SNS:Publish"
+        Resource = aws_sns_topic.waf_alarm_us_east_1.arn
+      }
+    ]
+  })
+}
+
+resource "aws_sns_topic_subscription" "lambda_us_east_1" {
+  provider  = aws.us_east_1
+  topic_arn = aws_sns_topic.waf_alarm_us_east_1.arn
+  protocol  = "lambda"
+  endpoint  = var.lambda_arn
+}
+
+resource "aws_lambda_permission" "sns_invoke_us_east_1" {
+  provider      = aws.us_east_1
+  statement_id  = "AllowSNSInvokeUsEast1"
+  action        = "lambda:InvokeFunction"
+  function_name = var.lambda_function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.waf_alarm_us_east_1.arn
+}

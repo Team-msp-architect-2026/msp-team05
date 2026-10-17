@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "AWS 리전"
   type        = string
-  default     = "eu-west-2"
+  default     = "ap-northeast-2"
 }
 
 variable "project_name" {
@@ -43,7 +43,7 @@ variable "private_subnet_db_cidrs" {
 variable "availability_zones" {
   description = "가용 영역 목록"
   type        = list(string)
-  default     = ["eu-west-2a", "eu-west-2c"]
+  default     = ["ap-northeast-2a", "ap-northeast-2c"]
 }
 
 variable "ami_id" {
@@ -66,7 +66,7 @@ variable "desired_capacity" {
 variable "domain_name" {
   description = "메인 도메인 이름"
   type        = string
-  default     = "kkybot.click"
+  default     = "kkybot.net"
 }
 
 variable "db_password" {
@@ -89,6 +89,18 @@ variable "cloudfront_secret" {
 
 variable "slack_webhook_url" {
   description = "Slack Incoming Webhook URL"
+  type        = string
+  sensitive   = true
+}
+
+variable "slack_webhook_url_infra" {
+  description = "Slack Incoming Webhook URL (인프라 알림 채널)"
+  type        = string
+  sensitive   = true
+}
+
+variable "slack_webhook_url_waf" {
+  description = "Slack Incoming Webhook URL (WAF 알림 채널)"
   type        = string
   sensitive   = true
 }

@@ -28,3 +28,8 @@ variable "slack_webhook_url" {
   type        = string
   sensitive   = true
 }
+
+variable "account_id" {
+  description = "AWS Account ID"
+  type        = string
+}
