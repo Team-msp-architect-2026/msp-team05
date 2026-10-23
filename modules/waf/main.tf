@@ -35,7 +35,7 @@ resource "aws_wafv2_web_acl" "main" {
     }
   }
 
-  # 규칙 2 - WAF Bot Control Targeted + JA4 핑거프린팅 (우선순위 1)
+  # 규칙 2 - WAF Bot Control Targeted (우선순위 1)
   rule {
     name     = "BotControlRule"
     priority = 1
@@ -55,7 +55,7 @@ resource "aws_wafv2_web_acl" "main" {
           }
         }
 
-        # JA4 핑거프린팅 - IP 로테이션 우회 봇 탐지
+        # Targeted 규칙 중 토큰 재사용·세션 과다 요청은 Block으로 변경
         rule_action_override {
           name = "TGT_TokenReuseIp"
           action_to_use {
